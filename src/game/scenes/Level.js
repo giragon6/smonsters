@@ -15,8 +15,6 @@ export class Level extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x00ff00);
-
         this.add.image(512, 384, 'background').setAlpha(0.5);
 
         this.monsters = this.add.group({ key: 'monster' });

@@ -1,7 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 
 import Phaser from 'phaser';
+import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
+import { EventBus } from './game/EventBus.js';
+
+let getVol = await getOrInitMic();
 
 function App ()
 {
@@ -12,48 +16,28 @@ function App ()
         end: 97,
         beats: [15.977,16.445,16.867,17.327,17.827,18.579,19.434,19.659,20.478,21.395,21.564,21.782,22.062,22.678,23.078,23.397,24.141,24.312,24.5,24.677,25.111,25.278,25.449,25.662,26.378,27.228,27.396,27.58,28.294,29.047,29.24,29.532,29.901,30.076,30.328,30.659,30.835,31.166,31.428,31.813,32.267,32.808,32.994,33.211,33.7,34.195,34.762,35.375,35.695,36.05,36.346,36.698,36.995,37.242,37.581,38.744,38.911,39.146,39.551,40.028,40.566,40.76,41.012,41.508,42.064,42.267,42.815,43.244,43.545,43.862,44.167,44.441,44.757,45.095,45.411,46.126,46.591,47.095,47.564,48.084,48.512,48.995,49.495,50.012,50.477,50.991,51.428,51.928,52.395,52.74,53.028,53.857,54.562,54.946,55.378,55.867,56.332,56.817,57.315,57.833,58.328,58.844,59.249,59.779,61.934,62.113,62.368,62.61,63.18,63.674,63.957,64.127,64.464,64.662,65.094,65.593,65.763,65.946,66.147,66.309,66.474,66.666,66.929,67.609,67.777,67.945,68.125,68.293,68.462,68.662,68.908,69.527,69.963,70.313,70.528,70.992,71.524,71.777,71.978,72.246,72.439,72.828,73.429,73.599,73.773,73.96,74.13,74.311,74.682,75.346,75.513,75.696,75.882,76.047,76.246,76.445,76.71,77.364,77.744,78.107,78.347,78.808,79.295,79.815,80.262,80.728,81.261,81.74,82.225,82.678,83.205,83.396,83.732,83.914,84.264,85.568,86.083,86.577,87.106,87.591,88.061,88.544,89.078,89.543,90.06,90.495,91.059,91.218,91.561,91.79]
     }
+
+    const VOLUME_DETECT_THROTTLE = 100; //ms
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            EventBus.emit('volume-detect', getVol());
+        return () => {
+            clearInterval(interval);
+        }
+        }, VOLUME_DETECT_THROTTLE)
+    })
+
+    const VOL_THRESHOLD = 0.1;
+
     const canvasRef = useRef();
     const audioRef = useRef(null);
     
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
-
-    const changeScene = () => {
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            scene.changeScene();
-        }
-    }
-
+    
     // Event emitted from the PhaserGame component
-    const currentScene = (scene) => {
-        
-    }
-
-    // record mic (use later)
-    async function initMic() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true});
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        function getVolume() {
-            analyser.getByteTimeDomainData(dataArray);
-            let sum = 0;
-            for(let i = 0; i < dataArray.length; i++){
-                const val = (dataArray[i] - 128) / 128;
-                sum += val*val;
-            }
-            return Math.sqrt(sum / dataArray.length);
-        }
-        return getVolume;
-    }
+    const currentScene = (scene) => {}
         
     //check if on beat
     function isOnBeat(audioCurrentTime, beats, window=0.5){
@@ -173,14 +157,12 @@ function App ()
         // };
         // document.addEventListener("keydown", keyListener);
 
-        const getVolume = await initMic();
         let lastTriggerTime = 0;
-
-        function micLoop(){
-            const volume=getVolume();
+        
+        function micLoop(volume){
             const now=Date.now();
-            // console.log(volume)
-            if(volume>0.1 && now-lastTriggerTime>200){
+            console.log(volume)
+            if(volume>VOL_THRESHOLD && now-lastTriggerTime>200){
                 lastTriggerTime=now;
                 const onBeat=isOnBeat(audio.currentTime, beatMap.beats, 0.5);
                 console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
@@ -189,17 +171,18 @@ function App ()
                     hitBeats.add(hitBeat);
                 }
             }
-            requestAnimationFrame(micLoop);
         }
-        micLoop();
+
+        EventBus.on('volume-detect', micLoop)
     }
 
     return (
         <div id="app">
             <PhaserGame className="phaserGame" ref={phaserRef} currentActiveScene={currentScene} />
             <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
+            <button onClick={startRhythmGame}></button>
         </div>
-)
+    )
 }
 
 export default App
