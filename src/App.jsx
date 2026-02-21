@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus.js';
+import Monster from './game/gameobjects/monster/Monster.js'
 
 let getVol = await getOrInitMic();
 
@@ -37,7 +38,9 @@ function App ()
     const phaserRef = useRef();
     
     // Event emitted from the PhaserGame component
-    const currentScene = (scene) => {}
+    const currentScene = (scene) => {
+        console.log(scene)
+    }
         
     //check if on beat
     function isOnBeat(audioCurrentTime, beats, window=0.5){
@@ -100,6 +103,32 @@ function App ()
             
         }
         const holdProgress = {};
+
+        const getCurrentAudioTime = () => audio.currentTime;
+
+        function spawnMonsters() {
+            const scene = phaserRef.current.scene;
+            for (const [beat, duration] of Object.entries(holdBeats)) {
+                const x = Phaser.Math.Between(64, scene.scale.width - 64);
+                const y = Phaser.Math.Between(64, scene.scale.height - 64);
+                const monster = new Monster(
+                    scene, 
+                    x, 
+                    y, 
+                    'monster',
+                    'monster-idle', 
+                    beat,
+                    duration,
+                    1.0,
+                    audio.currentTime,
+                    getCurrentAudioTime
+                );
+                scene.monsters.add(monster);
+                }
+            }
+
+        spawnMonsters()
+        
 
         //stop playing after last beat
         const lastBeat = beatMap.beats[beatMap.beats.length-1];
