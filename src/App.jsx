@@ -108,7 +108,7 @@ function App ()
         }, (lastBeat - levelData.start+1)*1000);
 
         function gameOver() {
-            audio.pause();
+            // audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
             phaserRef.current.scene.monsters.clear();
         }
