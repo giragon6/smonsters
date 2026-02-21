@@ -15,18 +15,12 @@ function App ()
     const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
-    const healthRef = useRef(null);
-
-    // The sprite can only be moved in the MainMenu Scene
-    const [canMoveSprite, setCanMoveSprite] = useState(true);
+    let isGameOver = false;
     
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
     
-    // Event emitted from the PhaserGame component
-    const currentScene = (scene) => {
-        setCanMoveSprite(scene.scene.key !== 'MainMenu');
-        
+    const currentScene = (scene) => {        
     }
     
     const VOLUME_DETECT_THROTTLE = 100; //ms
@@ -58,17 +52,11 @@ function App ()
             audioRef.current.pause();
             audioRef.current = null;
             if(lyricsRef.current) lyricsRef.current.textContent = "";
-            if(healthRef.current) healthRef.current.style.width = "100%";
         }
         const audio = new Audio(levelData.audio);
         audioRef.current = audio;
         audio.currentTime = levelData.start;
         audio.play();
-
-        //health
-        let health = 100;
-        const lossPerMiss = 100 / (levelData.beats.length - 0.75*levelData.beats.length); // only count non-hold beats for health loss
-        if(healthRef.current) healthRef.current.style.width = "100%";
 
         // hold notes
         const holdProgress = {};
@@ -108,7 +96,9 @@ function App ()
             audio.pause();
         }, (lastBeat - levelData.start+1)*1000);
 
+        EventBus.on('game-over', gameOver);
         function gameOver() {
+            isGameOver = true;
             audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
             phaserRef.current.scene.monsters.clear();
@@ -124,11 +114,6 @@ function App ()
             if(missedBeat){
                 missedBeats.add(missedBeat);
                 lastCheckedBeat = missedBeat;
-                health=Math.max(0, health-lossPerMiss);
-                if(healthRef.current) healthRef.current.style.width = health+'%';
-                if(health<=0){
-                    gameOver();
-                }
             }
         }, 1);
 
@@ -162,7 +147,7 @@ function App ()
                 ctx.font = "bold 48px sans-serif";
                 ctx.textAlign = "center";
                 ctx.fillText(`${hitBeats.size} / ${hitBeats.size + missedBeats.size} hits`, canvas.width/2, 55);
-                if(health>0 && lyricsRef.current) lyricsRef.current.textContent = "YOU WIN!";
+                if(!isGameOver && lyricsRef.current) lyricsRef.current.textContent = "YOU WIN!";
                 return;
             } else{
                 levelData.beats.forEach(beat => {
@@ -247,12 +232,6 @@ function App ()
             <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
-            <div style={{position:'fixed', top:16, right:16, width:200, zIndex:999}}>
-                <div style={{fontSize:12, color:'white', marginBottom:4, textAlign:'right'}}>HEALTH</div>
-                <div style={{background: '#ff0000', borderRadius:4, height:16, width:'100%'}}>
-                    <div ref={healthRef} style={{height:'100%', width:'100%', background: '#2ecc71', borderRadius:4, transition: 'width 0.2s'}}/>
-                </div>
-            </div>
             <button onClick={startRhythmGame}></button>
         </div>
     )

@@ -35,6 +35,8 @@ export class Preloader extends Scene
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
         this.load.spritesheet('monster', 'monster.png', { frameWidth: 2048, frameHeight: 2048});
+        this.load.spritesheet('cute-campfire', 'cute_campfire.png',{ frameWidth: 2048 } )
+        this.load.image('cute-logs', 'cute_logs.png')
     }
 
     create ()
@@ -47,7 +49,13 @@ export class Preloader extends Scene
             frameRate: 6,
             repeat: -1
         })
-        console.log(this.anims.anims)
+        
+        this.anims.create({
+            key: 'cute-campfire-crackle',
+            frames: this.anims.generateFrameNumbers('cute-campfire'),
+            frameRate: 6,
+            repeat: -1
+        })
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');

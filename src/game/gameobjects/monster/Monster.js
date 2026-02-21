@@ -1,3 +1,5 @@
+import { EventBus } from '../../EventBus.js';
+
 export default class Monster extends Phaser.GameObjects.Sprite {
   static tolerance = 0.1;
   
@@ -54,7 +56,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
       if (this.getCurrentAudioTime() > (this.beat + this.duration + Monster.tolerance)) {
         //attack
         this.destroy()
-        EventBus.emit('damage-taken', this.damage)
+        EventBus.emit('damage-taken', this.damage);
       }
     } else if (this.getCurrentAudioTime() > (this.beat - this.appearOffset)) {
       this.setVisible(true);
