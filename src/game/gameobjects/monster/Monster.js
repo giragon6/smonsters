@@ -4,7 +4,6 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   dx = 0;
   dy = 0;
   dscale = 0;
-  scaleThreshold = 2.0;
   damage;
 
   // provided by gamescene to run when monster gets close enough to attack
@@ -14,12 +13,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     super(scene, x, y, assetKey);
     this.assetKey = assetKey;
     this.scene = scene;
-    this.perfectTime = perfectTime; //ms
-    this.onAttack = onAttack;
     this.damage = damage;
-
-    this.dscale = 1.0 / perfectTime;
-    console.log(this.dscale)
 
     this.scene.add.existing(this);
   }
@@ -28,10 +22,5 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     this.x += this.dx * delta;
     this.y += this.dy * delta;
     this.scale += this.dscale * delta;
-
-    if (time >= this.perfectTime) {
-      console.log(this.scale)
-      this.destroy()
-    }
   }
 }
