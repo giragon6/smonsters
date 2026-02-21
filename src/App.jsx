@@ -104,7 +104,7 @@ function App ()
     }
         
     //check if on beat
-    function isOnBeat(audioCurrentTime, beats, window=0.15){
+    function isOnBeat(audioCurrentTime, beats, window=0.5){
         return beats.some(beat => Math.abs(audioCurrentTime - beat) < window);
     }
 
@@ -113,7 +113,6 @@ function App ()
     async function startRhythmGame() {
         const hitBeats = new Set();
         const missedBeats = new Set();
-
         //restart
         if(audioRef.current){
             audioRef.current.pause();
@@ -137,7 +136,7 @@ function App ()
         setInterval(() => {
             const t=audio.currentTime;
             const missedBeat = beatMap.beats.find(
-                beat => beat > lastCheckedBeat && beat < t - 0.2 && !hitBeats.has(beat)
+                beat => beat > lastCheckedBeat && beat < t - 0.5 && !hitBeats.has(beat)
             );
             if(missedBeat){
                 missedBeats.add(missedBeat);
@@ -149,7 +148,7 @@ function App ()
         const canvas = canvasRef.current;
         canvas.width  = window.innerWidth; 
         const ctx = canvas.getContext("2d");
-        const PIXELS_PER_SEC = 200;
+        const PIXELS_PER_SEC = 400;
         const gameStartTime = Date.now();
 
         //draw rhythm rects
@@ -205,22 +204,42 @@ function App ()
         }
         requestAnimationFrame(loop);
 
-        if(keyListener){
-            document.removeEventListener("keydown", keyListener);
-        }
-        keyListener = function(e) {
-            if(e.code === "KeyS") {
-                const onBeat = isOnBeat(audio.currentTime, beatMap.beats, 0.2);
+        // if(keyListener){
+        //     document.removeEventListener("keydown", keyListener);
+        // }
+        // keyListener = function(e) {
+        //     if(e.code === "KeyS") {
+        //         const onBeat = isOnBeat(audio.currentTime, beatMap.beats, 0.2);
+        //         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
+        //         if(onBeat){
+        //             const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.2);
+        //             hitBeats.add(hitBeat);
+        //         } else if(t>= beatMap.start && t<= beatMap.end){
+        //             missedBeats.add(t);
+        //         }
+        //     }
+        // };
+        // document.addEventListener("keydown", keyListener);
+
+        const getVolume = await initMic();
+        let lastTriggerTime = 0;
+
+        function micLoop(){
+            const volume=getVolume();
+            const now=Date.now();
+            // console.log(volume)
+            if(volume>0.1 && now-lastTriggerTime>200){
+                lastTriggerTime=now;
+                const onBeat=isOnBeat(audio.currentTime, beatMap.beats, 0.5);
                 console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
                 if(onBeat){
-                    const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.2);
+                    const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
                     hitBeats.add(hitBeat);
-                } else if(t>= beatMap.start && t<= beatMap.end){
-                    missedBeats.add(t);
                 }
             }
-        };
-        document.addEventListener("keydown", keyListener);
+            requestAnimationFrame(micLoop);
+        }
+        micLoop();
     }
 
     return (
