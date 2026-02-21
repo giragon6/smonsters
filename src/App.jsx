@@ -1,7 +1,12 @@
 import { useRef, useState } from 'react';
 import { levels } from './levels.js';
 import Phaser from 'phaser';
+import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
+import { EventBus } from './game/EventBus.js';
+import Monster from './game/gameobjects/monster/Monster.js'
+
+let getVol = await getOrInitMic();
 
 function App ()
 {
@@ -17,62 +22,9 @@ function App ()
     
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
-    const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
-
-    const changeScene = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            scene.changeScene();
-        }
-    }
-
-    const moveSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene && scene.scene.key === 'MainMenu')
-        {
-            // Get the update logo position
-            scene.moveLogo(({ x, y }) => {
-
-                setSpritePosition({ x, y });
-
-            });
-        }
-    }
-
-    const addSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            // Add more stars
-            const x = Phaser.Math.Between(64, scene.scale.width - 64);
-            const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-            //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-            const star = scene.add.sprite(x, y, 'star');
-
-            //  ... which you can then act upon. Here we create a Phaser Tween to fade the star sprite in and out.
-            //  You could, of course, do this from within the Phaser Scene code, but this is just an example
-            //  showing that Phaser objects and systems can be acted upon from outside of Phaser itself.
-            scene.add.tween({
-                targets: star,
-                duration: 500 + Math.random() * 1000,
-                alpha: 0,
-                yoyo: true,
-                repeat: -1
-            });
-        }
-    }
-
+    
     // Event emitted from the PhaserGame component
     const currentScene = (scene) => {
-
         setCanMoveSprite(scene.scene.key !== 'MainMenu');
         
     }
@@ -129,6 +81,32 @@ function App ()
 
         // hold notes
         const holdProgress = {};
+
+        const getCurrentAudioTime = () => audio.currentTime;
+
+        function spawnMonsters() {
+            const scene = phaserRef.current.scene;
+            for (const [beat, duration] of Object.entries(holdBeats)) {
+                const x = Phaser.Math.Between(64, scene.scale.width - 64);
+                const y = Phaser.Math.Between(64, scene.scale.height - 64);
+                const monster = new Monster(
+                    scene, 
+                    x, 
+                    y, 
+                    'monster',
+                    'monster-idle', 
+                    beat,
+                    duration,
+                    1.0,
+                    audio.currentTime,
+                    getCurrentAudioTime
+                );
+                scene.monsters.add(monster);
+                }
+            }
+
+        spawnMonsters()
+        
 
         //stop playing after last beat
         const lastBeat = levelData.beats[levelData.beats.length-1];
@@ -225,17 +203,15 @@ function App ()
             }
         }
         requestAnimationFrame(loop);
-
         const getVolume = await initMic();
         let lastTriggerTime = 0;
-
-        function micLoop(){
-            const volume=getVolume();
+        
+        function micLoop(volume){
             const now=Date.now();
             const t= audio.currentTime;
             // console.log(volume)
-            if(volume>0.1) {
-                for(const [beatStr, duration] of Object.entries(levelData.holdBeats)){
+            if(volume>VOL_THRESHOLD) {
+                for(const [beatStr, duration] of Object.entries(holdBeats)){
                     const beat = parseFloat(beatStr);
                     if(Math.abs(t-beat) < duration && !hitBeats.has(beat)){
                         holdProgress[beat] = (holdProgress[beat] || 0) + (1/60);
@@ -261,32 +237,14 @@ function App ()
                     holdProgress[beat] = 0;
                 }
             }
-            requestAnimationFrame(micLoop);
         }
-    micLoop();
+        EventBus.on('volume-detect', micLoop)
     }
 
     return (
         <div id="app">
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-            <div>
-                <div>
-                    <button className="button" onClick={changeScene}>Change Scene</button>
-                </div>
-                <div>
-                    <button disabled={canMoveSprite} className="button" onClick={moveSprite}>Toggle Movement</button>
-                </div>
-                <div className="spritePosition">Sprite Position:
-                    <pre>{`{\n  x: ${spritePosition.x}\n  y: ${spritePosition.y}\n}`}</pre>
-                </div>
-                <div>
-                    <button className="button" onClick={addSprite}>Add New Sprite</button>
-                </div>
-                <div>
-                    <button className="button" onClick={startRhythmGame}>Start Rhythm Game</button>
-                </div>
-            </div>
-
+            <PhaserGame className="phaserGame" ref={phaserRef} currentActiveScene={currentScene} />
+            <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
             <div style={{position:'fixed', top:16, right:16, width:200, zIndex:999}}>
@@ -295,8 +253,9 @@ function App ()
                     <div ref={healthRef} style={{height:'100%', width:'100%', background: '#2ecc71', borderRadius:4, transition: 'width 0.2s'}}/>
                 </div>
             </div>
+            <button onClick={startRhythmGame}></button>
         </div>
-)
+    )
 }
 
 export default App
