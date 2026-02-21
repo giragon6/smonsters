@@ -1,3 +1,12 @@
+TODO ADISHREE:
+- make beat lengths long/short
+- mic stuff
+
+if time:
+- sync w spotify
+- multiplayer / leaderboard
+- cuter ui
+
 # Phaser React Template
 
 This is a Phaser 3 project template that uses the React framework and Vite for bundling. It includes a bridge for React to Phaser game communication, hot-reloading for quick development workflow and scripts to generate production-ready builds.
