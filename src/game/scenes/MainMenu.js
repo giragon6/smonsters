@@ -12,9 +12,10 @@ export class MainMenu extends Scene
     }
 
     checkVol(volume) {
-        console.log(volume)
+        console.log('checkbol')
         if (volume > 0.1) {
             this.scene.start('Level');
+            EventBus.off('volume-detect', null, this);
         }
     }
 
