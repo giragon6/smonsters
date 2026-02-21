@@ -34,9 +34,9 @@ export class Preloader extends Scene
 
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
-        this.load.spritesheet('monster', 'monster.png', { frameWidth: 2048, frameHeight: 2048});
+        this.load.spritesheet('cute-monster', 'cute_monster.png', { frameWidth: 2048, frameHeight: 2048});
         this.load.spritesheet('cute-campfire', 'cute_campfire.png',{ frameWidth: 2048 } )
-        this.load.image('cute-logs', 'cute_logs.png')
+        this.load.image('cute-logs', 'cute_logs.png');
     }
 
     create ()
@@ -44,8 +44,8 @@ export class Preloader extends Scene
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, you can define global animations here, so we can use them in other scenes.
         this.anims.create({
-            key: 'monster-idle',
-            frames: this.anims.generateFrameNumbers('monster'),
+            key: 'cute-monster-idle',
+            frames: this.anims.generateFrameNumbers('cute-monster'),
             frameRate: 6,
             repeat: -1
         })

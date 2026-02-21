@@ -5,7 +5,6 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
   maxHealth;
 
   onDamage(damage) {
-    console.log(this.health)
     this.health -= Number(damage);
     if (this.health <= 0) {
       EventBus.emit('game-over');
@@ -14,13 +13,13 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
     this.alpha = this.health / this.maxHealth;
   }
 
-  constructor(scene, x, y, scale, assetKey, animKey, health=100) {
+  constructor(scene, x, y, scale, assetKey, animKey, logsKey, health=100) {
     super(scene, x, y, assetKey, 0);
     this.scale = scale;
     this.play(animKey);
     this.health = health;
     this.maxHealth = health;
-    const logs = scene.add.sprite(x, y, 'cute-logs');
+    const logs = scene.add.sprite(x, y, logsKey);
     logs.scale = scale;
 
     EventBus.on('damage-taken', (damage) => this.onDamage(damage));

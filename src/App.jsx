@@ -70,19 +70,15 @@ function App ()
             levelData.beats.forEach(beat => {
                 const x = Phaser.Math.Between(64, scene.scale.width - 64);
                 const y = Phaser.Math.Between(64, scene.scale.height - 64);
-                const monster = new Monster(
-                    scene, 
+                const monster = scene.addMonster(
                     x, 
                     y, 
-                    'monster',
-                    'monster-idle', 
                     beat,
                     (levelData.holdBeats[beat] ? levelData.holdBeats[beat] : DEFAULT_DURATION),
                     1.0,
                     audio.currentTime,
                     getCurrentAudioTime
                 );
-                scene.monsters.add(monster);
                 beatMonsterMap[beat] = monster;
             })
             }

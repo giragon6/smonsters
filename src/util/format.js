@@ -1,0 +1,1 @@
+export const toLevelKey = (songName) => songName.split(' ').join('_').replace('(', '').replace(')', '');
