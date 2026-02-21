@@ -6,7 +6,7 @@ import { PhaserGame } from './PhaserGame';
 function App ()
 {
     //set up level / song
-    const levelData = levels.golden;
+    const levelData = levels.partyintheusa;
     const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
@@ -134,7 +134,7 @@ function App ()
         const lastBeat = levelData.beats[levelData.beats.length-1];
         setTimeout(() => {
             audio.pause();
-        }, (lastBeat - levelData.start + 2)*1000);
+        }, (lastBeat - levelData.start+1)*1000);
 
 
         //missed rects
@@ -150,7 +150,7 @@ function App ()
                 health=Math.max(0, health-lossPerMiss);
                 if(healthRef.current) healthRef.current.style.width = health+'%';
                 if(health<=0){
-                    audio.pause();
+                    // audio.pause();
                     if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
                 }
             }
