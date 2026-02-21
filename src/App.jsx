@@ -108,10 +108,24 @@ function App ()
     //start game
     let keyListener = null;
 
-    async function startGame() {
+    async function startRhythmGame() {
         const audio = new Audio("/level1.mp3");
         audio.currentTime = beatMap.start;
         audio.play();
+
+        //check for missed beats
+
+        let lastCheckedBeat = 0;
+        setInterval(() => {
+            const t=audio.currentTime;
+            const missedBeat = beatMap.beats.find(
+                beat => beat < t - 0.2 && beat > lastCheckedBeat
+            );
+            if(missedBeat){
+                console.log("MISS!", "t=", missedBeat.toFixed(2));
+                lastCheckedBeat = missedBeat;
+            }
+        }, 100);
 
         // const getVolume = await initMic();
 
@@ -161,7 +175,7 @@ function App ()
                     <button className="button" onClick={addSprite}>Add New Sprite</button>
                 </div>
                 <div>
-                    <button className="button" onClick={startGame}>Start Game</button>
+                    <button className="button" onClick={startRhythmGame}>Start Rhythm Game</button>
                 </div>
             </div>
         </div>
