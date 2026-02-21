@@ -4,7 +4,6 @@ import Phaser from 'phaser';
 import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus.js';
-import Monster from './game/gameobjects/monster/Monster.js'
 
 let getVol = await getOrInitMic();
 
@@ -16,13 +15,14 @@ function App ()
     const canvasRef = useRef();
     const audioRef = useRef(null);
     let isGameOver = false;
+
     
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
     
     const currentScene = (scene) => {        
     }
-    
+        
     const VOLUME_DETECT_THROTTLE = 100; //ms
 
     useEffect(() => {
@@ -40,6 +40,23 @@ function App ()
     //check if on beat
     function isOnBeat(audioCurrentTime, beats, window=0.5){
         return levelData.beats.some(beat => Math.abs(audioCurrentTime - beat) < window);
+    }
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognitionEvent =
+        window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+    function startLevelSelection() {
+        const recognition = new SpeechRecognition;
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 5;
+        recognition.start();
+        recognition.onResult = (e) => {
+            phaserRef.current.scene.handleRecognition(e.results[0][0].transcript);
+        }
     }
 
     //start game

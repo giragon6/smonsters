@@ -1,6 +1,6 @@
-import { getOrInitMic } from '../../util/microphone';
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { Phases } from './Level.js';
 
 export class MainMenu extends Scene
 {
@@ -13,7 +13,7 @@ export class MainMenu extends Scene
 
     checkVol(volume) {
         // if (volume > 0.1) {
-            this.scene.start('Level');
+            this.scene.start('SelectLevel'+Phases.CUTE.toUpperCase());
             EventBus.off('volume-detect', null, this);
         // }
     }

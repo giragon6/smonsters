@@ -24,3 +24,4 @@ export async function getOrInitMic() {
   getVol = getVolume;
   return getVolume;
 }
+

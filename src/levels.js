@@ -1,6 +1,9 @@
+import { Phases } from './game/scenes/Level.js'
+
 export const levels = {
     golden: {
         song: "Golden (Kpop Demon Hunters)",
+        phase: Phases.CUTE,
         audio: "/golden.mp3",
         start: 43,
         end: 67,
@@ -23,6 +26,7 @@ export const levels = {
     },
     partyintheusa:{
         song: "Party in the USA (Miley Cyrus)",
+        phase: Phases.CUTE,
         audio: "/partyintheusa.mp3",
         start: 6,
         end: 30,

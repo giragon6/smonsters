@@ -21,7 +21,7 @@ export class Level extends Scene
     monsterAssetKey;
     monsterAnimKey;
 
-    constructor(phase, key)
+    constructor(key, phase)
     {
         super(key);
         this.phase = phase;
@@ -41,7 +41,7 @@ export class Level extends Scene
             this.scale.width / 2, 
             this.scale.height / 2, 
             0.7, 
-            rhis.fireAssetKey, 
+            this.fireAssetKey, 
             this.fireAnimKey, 
             this.logsKey,
             100
