@@ -8,6 +8,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   duration;
   startAudioTime;
   getCurrentAudioTime;
+  damage;
   scaleInitial;
   scaleFinal;
 
@@ -22,6 +23,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     appearOffset,
     startAudioTime, 
     getCurrentAudioTime,
+    damage = 10,
     scaleInitial = 0.25,
     scaleFinal = 0.5
   ) {
@@ -33,6 +35,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     this.appearOffset = Number(appearOffset);
     this.startAudioTime = Number(startAudioTime);
     this.getCurrentAudioTime = getCurrentAudioTime;
+    this.damage = damage;
     this.scaleInitial = Number(scaleInitial);
     this.scaleFinal = Number(scaleFinal);
 
@@ -48,11 +51,10 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   update(time, delta) {
     if (this.visible) {
       this.scale += this.dscale * delta; // todo: do with tweens
-      console.log(this.getCurrentAudioTime())
-      console.log(this.beat + this.duration + Monster.tolerance)
       if (this.getCurrentAudioTime() > (this.beat + this.duration + Monster.tolerance)) {
         //attack
         this.destroy()
+        EventBus.emit('damage-taken', this.damage)
       }
     } else if (this.getCurrentAudioTime() > (this.beat - this.appearOffset)) {
       this.setVisible(true);
@@ -61,5 +63,9 @@ export default class Monster extends Phaser.GameObjects.Sprite {
 
   onGameEnd() {
     this.destroy();
+  }
+
+  onHit() {
+    this.destroy()
   }
 }
