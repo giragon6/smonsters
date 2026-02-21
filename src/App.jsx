@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { levels } from './levels.js';
 import Phaser from 'phaser';
 import { getOrInitMic } from './util/microphone.js';
@@ -28,29 +28,20 @@ function App ()
         setCanMoveSprite(scene.scene.key !== 'MainMenu');
         
     }
+    
+    const VOLUME_DETECT_THROTTLE = 100; //ms
 
-    // record mic 
-    async function initMic() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true});
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        function getVolume() {
-            analyser.getByteTimeDomainData(dataArray);
-            let sum = 0;
-            for(let i = 0; i < dataArray.length; i++){
-                const val = (dataArray[i] - 128) / 128;
-                sum += val*val;
-            }
-            return Math.sqrt(sum / dataArray.length);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            EventBus.emit('volume-detect', getVol());
+        return () => {
+            clearInterval(interval);
         }
-        return getVolume;
-    }
+        }, VOLUME_DETECT_THROTTLE)
+    })
+
+    const VOL_THRESHOLD = 0.1;
+    const DEFAULT_DURATION = 0.5;
         
     //check if on beat
     function isOnBeat(audioCurrentTime, beats, window=0.5){
@@ -86,7 +77,7 @@ function App ()
 
         function spawnMonsters() {
             const scene = phaserRef.current.scene;
-            for (const [beat, duration] of Object.entries(holdBeats)) {
+            levelData.beats.forEach(beat => {
                 const x = Phaser.Math.Between(64, scene.scale.width - 64);
                 const y = Phaser.Math.Between(64, scene.scale.height - 64);
                 const monster = new Monster(
@@ -96,13 +87,13 @@ function App ()
                     'monster',
                     'monster-idle', 
                     beat,
-                    duration,
+                    (levelData.holdBeats[beat] ? levelData.holdBeats[beat] : DEFAULT_DURATION),
                     1.0,
                     audio.currentTime,
                     getCurrentAudioTime
                 );
                 scene.monsters.add(monster);
-                }
+            })
             }
 
         spawnMonsters()
@@ -114,6 +105,11 @@ function App ()
             audio.pause();
         }, (lastBeat - levelData.start + 2)*1000);
 
+        function gameOver() {
+            audio.pause();
+            if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
+            phaserRef.current.scene.monsters.clear();
+        }
 
         //missed rects
         let lastCheckedBeat =0;
@@ -128,8 +124,7 @@ function App ()
                 health=Math.max(0, health-lossPerMiss);
                 if(healthRef.current) healthRef.current.style.width = health+'%';
                 if(health<=0){
-                    audio.pause();
-                    if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
+                    gameOver();
                 }
             }
         }, 1);
@@ -203,7 +198,7 @@ function App ()
             }
         }
         requestAnimationFrame(loop);
-        const getVolume = await initMic();
+        const getVolume = await getOrInitMic();
         let lastTriggerTime = 0;
         
         function micLoop(volume){

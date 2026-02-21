@@ -48,6 +48,8 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   update(time, delta) {
     if (this.visible) {
       this.scale += this.dscale * delta; // todo: do with tweens
+      console.log(this.getCurrentAudioTime())
+      console.log(this.beat + this.duration + Monster.tolerance)
       if (this.getCurrentAudioTime() > (this.beat + this.duration + Monster.tolerance)) {
         //attack
         this.destroy()
@@ -55,5 +57,9 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     } else if (this.getCurrentAudioTime() > (this.beat - this.appearOffset)) {
       this.setVisible(true);
     }
+  }
+
+  onGameEnd() {
+    this.destroy();
   }
 }
