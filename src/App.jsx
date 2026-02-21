@@ -1,17 +1,12 @@
 import { useRef, useState } from 'react';
-
+import { levels } from './levels.js';
 import Phaser from 'phaser';
 import { PhaserGame } from './PhaserGame';
 
 function App ()
 {
-    //song beats
-    const beatMap = {
-        song: "Golden - Kpop Demon Hunters",
-        start: 43,
-        end: 67,
-        beats: [47.095,47.564,48.084,48.512,48.995,49.495,50.012,50.477,50.991,51.428,51.928,52.395,52.74,53.028,54.4,54.9,55.4,55.867,56.332,56.817,57.315,57.833,58.328,58.844,59.249,59.779,61.634,62.113,62.368,62.61,63.18,63.674,63.957,64.127,64.464,64.662,65.094,65.593,65.763,65.946,66.147,66.309,66.474,66.666,66.929,67.609,67.777,67.945,68.125,68.293,68.662]
-    }
+    //set up level / song
+    const levelData = levels.golden;
     const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
@@ -82,7 +77,7 @@ function App ()
         
     }
 
-    // record mic (use later)
+    // record mic 
     async function initMic() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true});
         const audioCtx = new AudioContext();
@@ -122,79 +117,31 @@ function App ()
             if(lyricsRef.current) lyricsRef.current.textContent = "";
             if(healthRef.current) healthRef.current.style.width = "100%";
         }
-        const audio = new Audio("/level1.mp3");
+        const audio = new Audio(levelData.audio);
         audioRef.current = audio;
-        audio.currentTime = beatMap.start;
+        audio.currentTime = levelData.start;
         audio.play();
 
         //health
         let health = 100;
-        const lossPerMiss = 100 / (beatMap.beats.length - 0.75*beatMap.beats.length); // only count non-hold beats for health loss
+        const lossPerMiss = 100 / (levelData.beats.length - 0.75*levelData.beats.length); // only count non-hold beats for health loss
         if(healthRef.current) healthRef.current.style.width = "100%";
 
         // hold notes
-        const holdBeats = {
-            // 47.095: 0.2,
-            // 47.564: 0.2,
-            // 48.084: 0.2,
-            // 48.512: 0.2, 
-            // 48.995: 0.2,
-            // 49.495: 0.2,
-            // 50.012: 0.2,
-            // 50.477: 0.2,
-            // 50.991:0.2,
-            // 51.428: 0.2, 
-            // 51.928: 0.2, 
-            // 52.395: 0.2,
-            // 52.74: 0.2,
-            53.028: 0.7,
-            // 54.4: 0.2, 
-            // 54.9: 0.2, 
-            // 55.4: 0.2,
-            // 55.867: 0.2, 
-            // 56.332: 0.2, 
-            // 56.817: 0.2, 
-            // 57.315:0.2,
-            // 57.833: 0.2,
-            // 58.328: 0.2,
-            // 58.844:0.2,
-            // 59.249:0.2, 
-            59.779: 1.5,
-            // 61.634: 0.2,
-            // 62.61: 0.2,
-            // 63.18: 0.2,
-            // 63.674:0.2,
-            // 64.662: 0.2,
-            // 66.666: 0.2,
-            // 66.929:0.2,
-            68.293:0.1,
-            68.662:0.1
-        }
         const holdProgress = {};
 
-        //lyrics
-        const lyrics = [
-            { t: 47.0,  text: "I'm done hidin', now I'm shinin'" },
-            { t: 50.5,  text: "Like I'm born to be" },
-            { t: 54.0,  text: "We dreamin' hard, we came so far" },
-            { t: 58.0,  text: "Now I believe" },
-            { t: 61.25,  text: "We're goin' up, up, up, it's our moment" },
-            { t: 65,  text: "You know together we're glowin'" },
-            { t: 67,  text: "Gonna be, gonna be golden" },
-        ];
-
         //stop playing after last beat
-        const lastBeat = beatMap.beats[beatMap.beats.length-1];
+        const lastBeat = levelData.beats[levelData.beats.length-1];
         setTimeout(() => {
             audio.pause();
-        }, (lastBeat - beatMap.start + 2)*1000);
+        }, (lastBeat - levelData.start + 2)*1000);
 
 
         //missed rects
         let lastCheckedBeat =0;
         setInterval(() => {
             const t=audio.currentTime;
-            const missedBeat = beatMap.beats.find(
+            const missedBeat = levelData.beats.find(
                 beat => beat > lastCheckedBeat && beat < t - 0.5 && !hitBeats.has(beat)
             );
             if(missedBeat){
@@ -242,11 +189,11 @@ function App ()
                 if(health>0 && lyricsRef.current) lyricsRef.current.textContent = "YOU WIN!";
                 return;
             } else{
-                beatMap.beats.forEach(beat => {
+                levelData.beats.forEach(beat => {
                     const x = canvas.width/2 + (beat-t) * PIXELS_PER_SEC;
                     if(x < -20 || x > canvas.width + 20) return;
                     
-                    const holdDuration = holdBeats[beat];
+                    const holdDuration = levelData.holdBeats[beat];
                     const width = holdDuration?holdDuration*PIXELS_PER_SEC : 20;
 
                     if(hitBeats.has(beat)) ctx.fillStyle = "#0f0";
@@ -262,7 +209,7 @@ function App ()
                 ctx.stroke();
 
                 // update lyrics
-                const lyric = lyrics.filter(l => l.t <= t).pop();
+                const lyric = levelData.lyrics.filter(l => l.t <= t).pop();
                 if(lyricsRef.current) {
                     lyricsRef.current.textContent = lyric ? lyric.text : "";
                 }
@@ -273,7 +220,7 @@ function App ()
         drawBeats();
 
         function loop() {
-            if(audio.currentTime < beatMap.end) {
+            if(audio.currentTime < levelData.end) {
                 requestAnimationFrame(loop);
             }
         }
@@ -288,7 +235,7 @@ function App ()
             const t= audio.currentTime;
             // console.log(volume)
             if(volume>0.1) {
-                for(const [beatStr, duration] of Object.entries(holdBeats)){
+                for(const [beatStr, duration] of Object.entries(levelData.holdBeats)){
                     const beat = parseFloat(beatStr);
                     if(Math.abs(t-beat) < duration && !hitBeats.has(beat)){
                         holdProgress[beat] = (holdProgress[beat] || 0) + (1/60);
@@ -301,16 +248,16 @@ function App ()
 
                 if(now-lastTriggerTime>200){
                     lastTriggerTime=now;
-                    const onBeat=isOnBeat(audio.currentTime, beatMap.beats, 0.5);
-                    const isHoldBeat = Object.keys(holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
+                    const onBeat=isOnBeat(audio.currentTime, levelData.beats, 0.5);
+                    const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
                     if(onBeat && !isHoldBeat){
-                        const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
+                        const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
                         hitBeats.add(hitBeat);
                         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
                     }
                 }
             } else {
-                for(const beat of Object.keys(holdBeats)){
+                for(const beat of Object.keys(levelData.holdBeats)){
                     holdProgress[beat] = 0;
                 }
             }
