@@ -111,11 +111,14 @@ function App ()
     //start game
     let keyListener = null;
     async function startRhythmGame() {
+        const hitBeats = new Set();
+        const missedBeats = new Set();
+
+        //restart
         if(audioRef.current){
             audioRef.current.pause();
             audioRef.current = null;
         }
-
         const audio = new Audio("/level1.mp3");
         audioRef.current = audio;
         audio.currentTime = beatMap.start;
@@ -128,6 +131,19 @@ function App ()
             audio.pause();
         }, (lastBeat - beatMap.start + 2)*1000);
 
+
+        //missed rects
+        let lastCheckedBeat =0;
+        setInterval(() => {
+            const t=audio.currentTime;
+            const missedBeat = beatMap.beats.find(
+                beat => beat > lastCheckedBeat && beat < t - 0.2 && !hitBeats.has(beat)
+            );
+            if(missedBeat){
+                missedBeats.add(missedBeat);
+                lastCheckedBeat = missedBeat;
+            }
+        }, 1);
 
         ///canvas constants (for the scrolling rhythm rects)
         const canvas = canvasRef.current;
@@ -164,7 +180,10 @@ function App ()
                 beatMap.beats.forEach(beat => {
                     const x = canvas.width/2 + (beat-t) * PIXELS_PER_SEC;
                     if(x < -20 || x > canvas.width + 20) return;
-                    ctx.fillStyle = beat < t? "#f00" : "#0f0";
+                    
+                    if(hitBeats.has(beat)) ctx.fillStyle = "#0f0";
+                    else if(missedBeats.has(beat)) ctx.fillStyle = "#f00";
+                    else ctx.fillStyle = "#fff";
                     ctx.fillRect(x-10, 10, 20, 60);
                 });
                 ctx.strokeStyle="white";
@@ -193,6 +212,12 @@ function App ()
             if(e.code === "KeyS") {
                 const onBeat = isOnBeat(audio.currentTime, beatMap.beats, 0.2);
                 console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
+                if(onBeat){
+                    const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.2);
+                    hitBeats.add(hitBeat);
+                } else if(t>= beatMap.start && t<= beatMap.end){
+                    missedBeats.add(t);
+                }
             }
         };
         document.addEventListener("keydown", keyListener);
