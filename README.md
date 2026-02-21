@@ -1,6 +1,4 @@
 TODO ADISHREE:
-- add to score
-- add other levels
 - text on screen for hits or other effects?
 
 if time:
