@@ -11,7 +11,7 @@ let getVol = await getOrInitMic();
 function App ()
 {
     //set up level / song
-    const levelData = levels.myheartwillgoon;
+    const levelData = levels.hangingtree;
     const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
@@ -108,7 +108,7 @@ function App ()
         }, (lastBeat - levelData.start+1)*1000);
 
         function gameOver() {
-            audio.pause();
+            // audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
             phaserRef.current.scene.monsters.clear();
         }
