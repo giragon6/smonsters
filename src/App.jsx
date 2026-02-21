@@ -113,20 +113,6 @@ function App ()
         audio.currentTime = beatMap.start;
         audio.play();
 
-        //check for missed beats
-
-        let lastCheckedBeat = 0;
-        setInterval(() => {
-            const t=audio.currentTime;
-            const missedBeat = beatMap.beats.find(
-                beat => beat < t - 0.2 && beat > lastCheckedBeat
-            );
-            if(missedBeat){
-                console.log("MISS!", "t=", missedBeat.toFixed(2));
-                lastCheckedBeat = missedBeat;
-            }
-        }, 100);
-
         // const getVolume = await initMic();
 
         function loop() {
