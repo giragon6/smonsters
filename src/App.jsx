@@ -5,6 +5,11 @@ import { PhaserGame } from './PhaserGame';
 
 function App ()
 {
+    // const beatMap = {
+    //     song: "Golden - Kpop Demon Hunters"
+    //     start: 15
+    // }
+
     // The sprite can only be moved in the MainMenu Scene
     const [canMoveSprite, setCanMoveSprite] = useState(true);
     
@@ -70,6 +75,28 @@ function App ()
         
     }
 
+    // record mic
+    async function initMic() {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true});
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        function getVolume(){
+            analyser.getByteTimeDomainData(dataArray);
+            let sum = 0;
+            for(let i = 0; i < dataArray.length; i++){
+                sum += val*val;
+            }
+            return Math.sqrt(sum / dataArray.length);
+        }
+        return getVolune;
+    }
+        
     return (
         <div id="app">
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
