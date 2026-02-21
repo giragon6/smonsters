@@ -81,6 +81,13 @@ export const levels = {
             244.166:1
         },
         lyrics: [
+            {t: 200, text: "You're here, "},
+            {t: 209, text: "There's nothing I fear"},
+            {t:213, text: "And I know that my heart will go on"},
+            {t: 223, text: "We'll stay"},
+            {t: 229, text: "Forever this way"},
+            {t: 233, text: "You are safe in my heart and"},
+            {t: 238, text: "My heart will go on and on"}
         ]
     }
 };
