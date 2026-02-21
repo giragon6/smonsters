@@ -177,13 +177,8 @@ function App ()
 
     return (
         <div id="app">
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-            <div>
-                <div>
-                    <button className="button" onClick={startRhythmGame}>Start Rhythm Game</button>
-                </div>
-            </div>
-            <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
+            <PhaserGame className="phaserGame" ref={phaserRef} currentActiveScene={currentScene} />
+            <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
         </div>
 )
 }
