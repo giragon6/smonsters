@@ -120,12 +120,17 @@ function App ()
             audioRef.current.pause();
             audioRef.current = null;
             if(lyricsRef.current) lyricsRef.current.textContent = "";
+            if(healthRef.current) healthRef.current.style.width = "100%";
         }
         const audio = new Audio("/level1.mp3");
         audioRef.current = audio;
         audio.currentTime = beatMap.start;
         audio.play();
 
+        //health
+        let health = 100;
+        const lossPerMiss = 100 / (beatMap.beats.length - 0.75*beatMap.beats.length); // only count non-hold beats for health loss
+        if(healthRef.current) healthRef.current.style.width = "100%";
 
         // hold notes
         const holdBeats = {
@@ -195,6 +200,12 @@ function App ()
             if(missedBeat){
                 missedBeats.add(missedBeat);
                 lastCheckedBeat = missedBeat;
+                health=Math.max(0, health-lossPerMiss);
+                if(healthRef.current) healthRef.current.style.width = health+'%';
+                if(health<=0){
+                    audio.pause();
+                    if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
+                }
             }
         }, 1);
 
@@ -227,8 +238,8 @@ function App ()
                 ctx.fillStyle = "#fff";
                 ctx.font = "bold 48px sans-serif";
                 ctx.textAlign = "center";
-                ctx.fillText(`GOOD JOB! ${hitBeats.size} / ${beatMap.beats.length} hits`, canvas.width/2, 55);
-
+                ctx.fillText(`${hitBeats.size} / ${hitBeats.size + missedBeats.size} hits`, canvas.width/2, 55);
+                if(health>0 && lyricsRef.current) lyricsRef.current.textContent = "YOU WIN!";
                 return;
             } else{
                 beatMap.beats.forEach(beat => {
@@ -328,8 +339,15 @@ function App ()
                     <button className="button" onClick={startRhythmGame}>Start Rhythm Game</button>
                 </div>
             </div>
+
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
+            <div style={{position:'fixed', top:16, right:16, width:200, zIndex:999}}>
+                <div style={{fontSize:12, color:'white', marginBottom:4, textAlign:'right'}}>HEALTH</div>
+                <div style={{background: '#ff0000', borderRadius:4, height:16, width:'100%'}}>
+                    <div ref={healthRef} style={{height:'100%', width:'100%', background: '#2ecc71', borderRadius:4, transition: 'width 0.2s'}}/>
+                </div>
+            </div>
         </div>
 )
 }
