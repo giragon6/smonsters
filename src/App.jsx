@@ -12,8 +12,10 @@ function App ()
         end: 67,
         beats: [47.095,47.564,48.084,48.512,48.995,49.495,50.012,50.477,50.991,51.428,51.928,52.395,52.74,53.028,54.4,54.9,55.4,55.867,56.332,56.817,57.315,57.833,58.328,58.844,59.249,59.779,61.634,62.113,62.368,62.61,63.18,63.674,63.957,64.127,64.464,64.662,65.094,65.593,65.763,65.946,66.147,66.309,66.474,66.666,66.929,67.609,67.777,67.945,68.125,68.293,68.662]
     }
+    const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
+    const healthRef = useRef(null);
 
     // The sprite can only be moved in the MainMenu Scene
     const [canMoveSprite, setCanMoveSprite] = useState(true);
@@ -117,6 +119,7 @@ function App ()
         if(audioRef.current){
             audioRef.current.pause();
             audioRef.current = null;
+            if(lyricsRef.current) lyricsRef.current.textContent = "";
         }
         const audio = new Audio("/level1.mp3");
         audioRef.current = audio;
@@ -161,9 +164,19 @@ function App ()
             // 66.929:0.2,
             68.293:0.1,
             68.662:0.1
-            
         }
         const holdProgress = {};
+
+        //lyrics
+        const lyrics = [
+            { t: 47.0,  text: "I'm done hidin', now I'm shinin'" },
+            { t: 50.5,  text: "Like I'm born to be" },
+            { t: 54.0,  text: "We dreamin' hard, we came so far" },
+            { t: 58.0,  text: "Now I believe" },
+            { t: 61.25,  text: "We're goin' up, up, up, it's our moment" },
+            { t: 65,  text: "You know together we're glowin'" },
+            { t: 67,  text: "Gonna be, gonna be golden" },
+        ];
 
         //stop playing after last beat
         const lastBeat = beatMap.beats[beatMap.beats.length-1];
@@ -236,6 +249,12 @@ function App ()
                 ctx.moveTo(canvas.width/2, 0);
                 ctx.lineTo(canvas.width/2, 80);
                 ctx.stroke();
+
+                // update lyrics
+                const lyric = lyrics.filter(l => l.t <= t).pop();
+                if(lyricsRef.current) {
+                    lyricsRef.current.textContent = lyric ? lyric.text : "";
+                }
             }
 
             requestAnimationFrame(drawBeats);
@@ -248,23 +267,6 @@ function App ()
             }
         }
         requestAnimationFrame(loop);
-
-        // if(keyListener){
-        //     document.removeEventListener("keydown", keyListener);
-        // }
-        // keyListener = function(e) {
-        //     if(e.code === "KeyS") {
-        //         const onBeat = isOnBeat(audio.currentTime, beatMap.beats, 0.2);
-        //         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
-        //         if(onBeat){
-        //             const hitBeat = beatMap.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.2);
-        //             hitBeats.add(hitBeat);
-        //         } else if(t>= beatMap.start && t<= beatMap.end){
-        //             missedBeats.add(t);
-        //         }
-        //     }
-        // };
-        // document.addEventListener("keydown", keyListener);
 
         const getVolume = await initMic();
         let lastTriggerTime = 0;
@@ -326,6 +328,7 @@ function App ()
                     <button className="button" onClick={startRhythmGame}>Start Rhythm Game</button>
                 </div>
             </div>
+            <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
         </div>
 )
