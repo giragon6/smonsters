@@ -10,11 +10,10 @@ let getVol = await getOrInitMic();
 function App ()
 {
     //set up level / song
-    const levelData = levels.partyintheusa;
     const lyricsRef = useRef();
     const canvasRef = useRef();
     const audioRef = useRef(null);
-    let isGameOver = false;
+    let isGameOver = true;
 
     
     //  References to the PhaserGame component (game and scene are exposed)
@@ -22,7 +21,7 @@ function App ()
     
     const currentScene = (scene) => {        
     }
-        
+
     const VOLUME_DETECT_THROTTLE = 100; //ms
 
     useEffect(() => {
@@ -34,34 +33,30 @@ function App ()
         }, VOLUME_DETECT_THROTTLE)
     })
 
+    useEffect(() => {
+        EventBus.once('start-rhythm-game', (ld, s) => {
+        console.log(s)
+        if (isGameOver) {
+            startRhythmGame(ld, s);
+        }
+         });
+    }, [])
+
     const VOL_THRESHOLD = 0.1;
     const DEFAULT_DURATION = 0.5;
         
     //check if on beat
-    function isOnBeat(audioCurrentTime, beats, window=0.5){
+    function isOnBeat(levelData, audioCurrentTime, beats, window=0.5){
         return levelData.beats.some(beat => Math.abs(audioCurrentTime - beat) < window);
     }
 
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-    const SpeechRecognitionEvent =
-        window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-    function startLevelSelection() {
-        const recognition = new SpeechRecognition;
-        recognition.continuous = false;
-        recognition.lang = 'en-US';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 5;
-        recognition.start();
-        recognition.onResult = (e) => {
-            phaserRef.current.scene.handleRecognition(e.results[0][0].transcript);
-        }
-    }
 
     //start game
     let keyListener = null;
-    async function startRhythmGame() {
+    async function startRhythmGame(levelData, scene) {
+        isGameOver = false;
+        console.log('starting......')
         const hitBeats = new Set();
         const missedBeats = new Set();
         //restart
@@ -83,7 +78,6 @@ function App ()
         const beatMonsterMap = {}
 
         function spawnMonsters() {
-            const scene = phaserRef.current.scene;
             levelData.beats.forEach(beat => {
                 const x = Phaser.Math.Between(64, scene.scale.width - 64);
                 const y = Phaser.Math.Between(64, scene.scale.height - 64);
@@ -114,7 +108,8 @@ function App ()
             isGameOver = true;
             audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
-            phaserRef.current.scene.monsters.clear();
+            scene.gameOver();
+            EventBus.once('start-rhythm-game', async (levelData) => await startRhythmGame(levelData));
         }
 
         //missed rects
@@ -220,7 +215,7 @@ function App ()
 
                 if(now-lastTriggerTime>200){
                     lastTriggerTime=now;
-                    const onBeat=isOnBeat(audio.currentTime, levelData.beats, 0.5);
+                    const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, 0.5);
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
                     if(onBeat && !isHoldBeat){
                         const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
@@ -245,7 +240,6 @@ function App ()
             <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
-            <button onClick={startRhythmGame}></button>
         </div>
     )
 }

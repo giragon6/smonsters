@@ -8,22 +8,6 @@ import { levels } from '../levels'
 import { toLevelKey } from '../util/format';
 import { SelectLevel } from './scenes/SelectLevel';
 
-const levelsVals = Object.values(levels);
-let levelsArr = []
-for (const level of levelsVals) {
-    levelsArr.push(new Level(toLevelKey(level["song"]), level["phase"]))
-}
-console.log(levelsArr)
-
-const phases = Object.keys(Phases);
-let selectLevels = [];
-for (const phase of phases) {
-    const sl = new SelectLevel('SelectLevel'+phase);
-    sl.phase = phase;
-    selectLevels.push(sl);
-}
-console.log(selectLevels)
-
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
@@ -46,13 +30,13 @@ const config = {
         preBoot: (game) => {
             const levelsVals = Object.values(levels);
             for (const level of levelsVals) {
-                game.scene.add(level["song"], new Level(toLevelKey(level["song"]), level["phase"]), true)
+                game.scene.add(toLevelKey(level['song']), new Level(toLevelKey(level['song']), level), false)
             }
             const phases = Object.keys(Phases);
             for (const phase of phases) {
                 const sl = new SelectLevel('SelectLevel'+phase.toUpperCase());
                 sl.phase = phase;
-                game.scene.add('SelectLevel'+phase, sl, true);
+                game.scene.add('SelectLevel'+phase, sl, false);
             }
         }
     }

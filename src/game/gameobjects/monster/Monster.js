@@ -47,7 +47,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     this.scale = this.scaleInitial;
     this.dscale = (this.scaleFinal - this.scaleInitial)/((Number(this.duration) + Number(this.appearOffset)) * 1000);
 
-    this.scene.add.existing(this);
+    // this.scene.add.existing(this);
   }
 
   update(time, delta) {
@@ -64,6 +64,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   }
 
   onGameEnd() {
+    this.setVisible(false);
     this.destroy();
   }
 

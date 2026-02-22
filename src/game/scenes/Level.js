@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus.js';
 import { Scene } from 'phaser';
 import Campfire from '../gameobjects/campfire/Campfire.js';
 import Monster from '../gameobjects/monster/Monster.js';
+import { toLevelKey } from '../../util/format.js';
 
 export const Phases = Object.freeze({
     CUTE: 'cute',
@@ -15,16 +16,19 @@ export class Level extends Scene
     phase;
     campfire;
 
+    levelData;
+
     fireAssetKey;
     fireAnimKey;
     logsKey;
     monsterAssetKey;
     monsterAnimKey;
 
-    constructor(key, phase)
+    constructor(key, levelData)
     {
         super(key);
-        this.phase = phase;
+        this.phase = levelData['phase'].toLowerCase();
+        this.levelData = levelData;
         this.fireAssetKey = this.phase + '-campfire';
         this.fireAnimKey = this.phase + '-campfire-crackle';
         this.logsKey = this.phase + '-logs';
@@ -51,7 +55,13 @@ export class Level extends Scene
 
         this.monsters = this.add.group({ runChildUpdate: true });
 
+        // this.events.on("ready", this.ready);
         EventBus.emit('current-scene-ready', this);
+    }
+    
+    init() {
+        if (!this.monsters) this.monsters = this.add.group({ runChildUpdate: true });
+        EventBus.emit('start-rhythm-game', this.levelData, this);
     }
 
     addMonster(
@@ -81,12 +91,14 @@ export class Level extends Scene
             scaleInitial,
             scaleFinal
         )
-        this.monsters.add(monster);
+        this.monsters.add(monster, true);
+        monster.depth = 100;
         return monster;
     }
 
     gameOver()
     {
+        this.monsters.clear(true, true);
         this.scene.start('GameOver');
     }
 }
