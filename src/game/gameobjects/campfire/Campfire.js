@@ -9,11 +9,19 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
 
   onDamage(damage) {
     this.health -= Number(damage);
+    console.log(this.health)
     if (this.health <= 0) {
+      EventBus.off('damage-taken', null, this);
       EventBus.emit('game-over');
       this.destroy();
+    } else {
+      this.alpha = this.health / this.maxHealth;
     }
-    this.alpha = this.health / this.maxHealth;
+  }
+
+  onWin() {
+    EventBus.off('damage-taken', null, this);
+    this.destroy();
   }
 
   constructor(scene, x, y, scale, assetKey, animKey, logsKey, health=100) {
@@ -25,7 +33,7 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
     this.logsKey = logsKey;
 
     EventBus.on('damage-taken', (damage) => this.onDamage(damage));
-    this.play(this.animKey);
+    if (this.animKey) this.play(this.animKey);
     let logs = scene.add.sprite(x, y, this.logsKey);
     logs.scale = this.scale;
   }
