@@ -23,6 +23,7 @@ export class Level extends Scene
     logsKey;
     monsterAssetKey;
     monsterAnimKey;
+    vignette;
 
     constructor(key, levelData)
     {
@@ -39,7 +40,9 @@ export class Level extends Scene
     create ()
     {
         this.add.image(this.scale.width / 2, this.scale.height / 2, this.phase !== Phases.CREEPY ? 'background-no-fire' : 'creepy-bg');
-        
+        this.vignette = this.add.image(this.scale.width / 2, this.scale.height / 2, 'vignette');
+        this.vignette.alpha = 0;
+
         this.campfire = new Campfire(
             this, 
             this.scale.width / 2, 
@@ -63,6 +66,12 @@ export class Level extends Scene
         EventBus.emit('start-rhythm-game', this.levelData, this);
 
         this.glitchGraphics = this.add.graphics().setDepth(9999);
+
+        if (this.phase == Phases.CREEPY) EventBus.on('missed-beats', (missed) => this.onMissedUpdate(missed));
+    }
+
+    onMissedUpdate(missed) {
+        this.vignette.alpha = missed / this.levelData.maxMissed;
     }
 
     runGlitchEffect() {

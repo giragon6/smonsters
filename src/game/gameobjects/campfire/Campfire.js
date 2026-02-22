@@ -29,7 +29,6 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
     this.animKey = animKey;
     this.logsKey = logsKey;
     this.maxMissed = Number(maxMissed);
-    console.log(maxMissed)
 
     EventBus.on('missed-beats', (missed) => this.onMissedUpdate(missed));
     if (this.animKey) this.play(this.animKey);

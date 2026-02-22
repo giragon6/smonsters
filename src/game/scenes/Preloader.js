@@ -36,6 +36,7 @@ export class Preloader extends Scene
         this.load.image('creepy-logs', 'creepy_campfire.png');
         this.load.image('creepy-monster', 'creepy_monster.png');
         this.load.image('creepy-bg', 'creepy_bg.png');
+        this.load.image('vignette', 'vignette.png')
         this.load.image('title', 'title.jpg');
         this.load.video('introCutscene', 'introCutscene.mp4');
         this.load.video('afterCute', 'afterCute.mp4');
@@ -87,7 +88,7 @@ export class Preloader extends Scene
             video.on('error', goToCutePhase);
             video.play();
 
-            setTimeout(() => { EventBus.on('volume-detect', (v) => { if (v > SKIP_THRESHOLD) goToCutePhase(); }) }, 1500)
+            setTimeout(() => { EventBus.on('volume-detect', (v) => { if (v > SKIP_THRESHOLD) goToCutePhase(); }) }, 1000)
         } else {
             goToCutePhase();
         }
