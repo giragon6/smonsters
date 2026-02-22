@@ -14,7 +14,7 @@ import { BeginStory } from './scenes/BeginStory';
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: Phaser.AUTO,
-    width: 2244,
+    width: 2244,   // resize game: change these (e.g. 1920, 1080)
     height: 1452,
     parent: 'game-container',
     backgroundColor: '#028af8',

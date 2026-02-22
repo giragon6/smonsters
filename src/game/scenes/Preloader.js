@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { Phases } from './Level.js';
 
 export class Preloader extends Scene
 {
@@ -29,7 +30,7 @@ export class Preloader extends Scene
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
+        //  Load  assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
         this.load.image('logo', 'logo.png');
@@ -44,6 +45,8 @@ export class Preloader extends Scene
         this.load.image('creepy-logs', 'creepy_campfire.png');
         this.load.image('creepy-monster', 'creepy_monster.png');
         this.load.image('creepy-bg', 'creepy_bg.png');
+        this.load.image('title', 'title.jpg');
+        this.load.video('introCutscene', 'introCutscene.mp4');
     }
 
     create ()
@@ -78,7 +81,19 @@ export class Preloader extends Scene
             repeat: -1
         })
 
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+        const goToCutePhase = () => this.scene.start('SelectLevel' + Phases.CUTE.toUpperCase());
+        if (this.cache.video.exists('introCutscene')) {
+            const video = this.add.video(this.scale.width / 2, this.scale.height / 2, 'introCutscene');
+            video.play();
+
+            video.on('created', () => {
+                video.setScale(Math.min(this.scale.width/video.width, this.scale.height/video.height));
+            });
+            video.on('complete', goToCutePhase);
+            video.on('error', goToCutePhase);
+            video.play();
+        } else {
+            goToCutePhase();
+        }
     }
 }
