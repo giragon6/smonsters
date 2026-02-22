@@ -31,7 +31,7 @@ export class SelectLevel extends Scene {
       this.levelLabelMap[level['song']] = levelLabel;
       levelLabels.add(levelLabel);
     });
-    this.selected = this.phaseLevelData[0];
+    this.selected = this.phaseLevelData[this.phaseLevelData.length - 1];
     Phaser.Actions.GridAlign(
       levelLabels.getChildren(),
       {

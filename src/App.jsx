@@ -72,9 +72,8 @@ function App ()
         });
     }, [])
 
-    const VOL_THRESHOLD = 0.1;
-    const DEFAULT_DURATION = 0.5;
-    const BEAT_WINDOW = 0.5; 
+    const VOL_THRESHOLD = 0.05;
+    const BEAT_WINDOW = 0.1; 
 
     //check if on beat
     function isOnBeat(levelData, audioCurrentTime, beats, window = BEAT_WINDOW){
@@ -130,7 +129,7 @@ function App ()
                     x, 
                     y, 
                     beat,
-                    (levelData.holdBeats[beat] ? levelData.holdBeats[beat] : DEFAULT_DURATION),
+                    (levelData.holdBeats[beat] ? levelData.holdBeats[beat] : BEAT_WINDOW),
                     1.0,
                     audio.currentTime,
                     getCurrentAudioTime
@@ -138,7 +137,6 @@ function App ()
                 beatMonsterMap[beat] = monster;
             })
             }
-
         spawnMonsters()
         
 
@@ -169,6 +167,10 @@ function App ()
             );
             if(missedBeat){
                 missedBeats.add(missedBeat);
+                const monster = beatMonsterMap[missedBeat];
+                console.log(monster)
+                EventBus.emit('damage-taken', monster.damage);
+                monster.destroy();
                 lastCheckedBeat = missedBeat;
                 if (missedBeats.size > levelData.maxMissed) {
                     EventBus.emit('game-over');
@@ -228,7 +230,7 @@ function App ()
                     if(x < -20 || x > canvas.width + 20) return;
                     
                     const holdDuration = levelData.holdBeats[beat];
-                    const width = holdDuration?holdDuration*PIXELS_PER_SEC : 20;
+                    const width = holdDuration?holdDuration*PIXELS_PER_SEC : BEAT_WINDOW*PIXELS_PER_SEC;
 
                     if(hitBeats.has(beat)) ctx.fillStyle = "#0f0";
                     else if(missedBeats.has(beat)) ctx.fillStyle = "#f00";
@@ -259,9 +261,14 @@ function App ()
             }
         }
         requestAnimationFrame(loop);
-        const getVolume = await getOrInitMic();
         let lastTriggerTime = 0;
         
+
+        function addHitBeat(beat) {
+            hitBeats.add(beat);
+            const monster = beatMonsterMap[beat];
+            monster.destroy();
+        }
 
         //debug
         if(currentMicLoop) {
@@ -277,7 +284,7 @@ function App ()
                     if(t-beat>-0.1 && t-beat<BEAT_WINDOW){
                         const isHoldBeat=levelData.holdBeats[beat] !== undefined;
                         if(!isHoldBeat){
-                            hitBeats.add(beat);
+                            addHitBeat(beat);
                             console.log('HIT!', beat.toFixed(2));
                         }
                     }
@@ -286,9 +293,9 @@ function App ()
                 for(const [beatStr, duration] of Object.entries(levelData.holdBeats)){
                     const beat = parseFloat(beatStr);
                     if(t-beat>-0.1 && t-beat<duration && !hitBeats.has(beat)){
-                        holdProgress[beat] = (holdProgress[beat] || 0) + (VOLUME_DETECT_THROTTLE/1000);
+                        holdProgress[beat] = (holdProgress[beat] || 0) + (VOLUME_DETECT_THROTTLE);
                         if(holdProgress[beat] >= duration){
-                            hitBeats.add(beat);
+                            addHitBeat(beat);
                             console.log(`HOLD HIT! beat=${beat}, duration=${duration}s`);
                         }
                     }
@@ -300,8 +307,7 @@ function App ()
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < BEAT_WINDOW);
                     if(onBeat && !isHoldBeat){
                         const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
-                        beatMonsterMap[hitBeat].onHit()
-                        hitBeats.add(hitBeat);
+                        addHitBeat(hitBeat);
                         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
                     }
                 }
