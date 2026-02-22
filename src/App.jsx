@@ -168,8 +168,7 @@ function App ()
             if(missedBeat){
                 missedBeats.add(missedBeat);
                 const monster = beatMonsterMap[missedBeat];
-                console.log(monster)
-                EventBus.emit('damage-taken', monster.damage);
+                EventBus.emit('missed-beats', missedBeats.size);
                 monster.destroy();
                 lastCheckedBeat = missedBeat;
                 if (missedBeats.size > levelData.maxMissed) {
@@ -267,7 +266,7 @@ function App ()
         function addHitBeat(beat) {
             hitBeats.add(beat);
             const monster = beatMonsterMap[beat];
-            monster.destroy();
+            if (monster) monster.destroy();
         }
 
         //debug
@@ -285,7 +284,6 @@ function App ()
                         const isHoldBeat=levelData.holdBeats[beat] !== undefined;
                         if(!isHoldBeat){
                             addHitBeat(beat);
-                            console.log('HIT!', beat.toFixed(2));
                         }
                     }
                 });

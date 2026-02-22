@@ -6,32 +6,32 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
   assetKey;
   animKey;
   logsKey;
+  missed;
 
-  onDamage(damage) {
-    this.health -= Number(damage);
+  onMissedUpdate(missed) {
+    this.missed = Number(missed);
     if (this.health <= 0) {
-      EventBus.off('damage-taken', null, this);
-      EventBus.emit('game-over');
+      EventBus.off('missed-beats', null, this);
       this.destroy();
     } else {
-      this.alpha = this.health / this.maxHealth;
+      this.alpha = (this.maxMissed - this.missed) / this.maxMissed;
     }
   }
 
   onWin() {
-    EventBus.off('damage-taken', null, this);
+    EventBus.off('missed-beats', null, this);
     this.destroy();
   }
 
-  constructor(scene, x, y, scale, assetKey, animKey, logsKey, health=100) {
+  constructor(scene, x, y, scale, assetKey, animKey, logsKey, maxMissed) {
     super(scene, x, y, assetKey, 0);
     this.scale = scale;
-    this.health = health;
-    this.maxHealth = health;
     this.animKey = animKey;
     this.logsKey = logsKey;
+    this.maxMissed = Number(maxMissed);
+    console.log(maxMissed)
 
-    EventBus.on('damage-taken', (damage) => this.onDamage(damage));
+    EventBus.on('missed-beats', (missed) => this.onMissedUpdate(missed));
     if (this.animKey) this.play(this.animKey);
     let logs = scene.add.sprite(x, y, this.logsKey);
     logs.scale = this.scale;

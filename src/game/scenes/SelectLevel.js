@@ -43,7 +43,7 @@ export class SelectLevel extends Scene {
       }
     )   
     this.curVol = null;
-    setTimeout(() => {EventBus.on('volume-detect', (v) => this.manualVoiceSelect(v));}, 1000) // wait to prevent scream input overlap
+    setTimeout(() => {EventBus.on('volume-detect', (v) => this.manualVoiceSelect(v));}, 2000) // wait to prevent scream input overlap
   }
 
   manualVoiceSelect(volume) {

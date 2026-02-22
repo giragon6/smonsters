@@ -1,8 +1,9 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { Phases } from './Level';
 
 export class GameOver extends Scene
-{
+{    
     constructor ()
     {
         super('GameOver');
@@ -14,7 +15,7 @@ export class GameOver extends Scene
 
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'background-no-fire').setAlpha(0.5);
 
-        this.add.text(this.scale.width / 2, this.scale.height / 2, 'You lost. \n Your campfire went out so monsters attacked you.', {
+        this.add.text(this.scale.width / 2, this.scale.height / 2, 'You lost. \n Your campfire went out, so monsters attacked you.', {
             fontFamily: 'Arial Black', fontSize: 64, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
@@ -23,3 +24,4 @@ export class GameOver extends Scene
         EventBus.emit('current-scene-ready', this);
     }
 }
+

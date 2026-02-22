@@ -47,7 +47,7 @@ export class Level extends Scene
             this.fireAssetKey, 
             this.phase === Phases.CREEPY ? null : this.fireAnimKey, 
             this.logsKey,
-            Math.round(this.levelData.beats.length * 0.75) * Monster.damage //need to get 75% beats
+            this.levelData.maxMissed
         );
 
         this.add.existing(this.campfire)
@@ -82,7 +82,6 @@ export class Level extends Scene
             appearOffset,
             startAudioTime,
             getCurrentAudioTime,
-            Monster.damage,
             scaleInitial,
             scaleFinal
         )
