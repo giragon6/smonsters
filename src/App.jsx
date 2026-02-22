@@ -5,10 +5,36 @@ import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus.js';
 
-let getVol = await getOrInitMic();
+const DEBUG = true;
+
+if (!DEBUG) {
+    let getVol = await getOrInitMic();
+}
+
 
 function App ()
 {
+    if (DEBUG) {
+        let curVol = 0.05;
+        function getVol() {
+            return curVol;
+        }
+        const handleKeyDown = (e) => {
+            if (e.key === 'v') {
+                e.preventDefault()
+                curVol = 0.95
+            }
+        }
+        const handleKeyUp = (e) => {
+            if (e.key === 'v') {
+                e.preventDefault()
+                curVol = 0.05
+            }
+        }
+        document.body.addEventListener('keydown', handleKeyDown)
+        document.body.addEventListener('keyup', handleKeyUp)
+    }
+
     //set up level / song
     const lyricsRef = useRef();
     const canvasRef = useRef();
@@ -77,6 +103,7 @@ function App ()
         const yoffset = xoffset;
 
         function spawnMonsters() {
+            console.log(levelData.beats)
             levelData.beats.forEach(beat => {
                 const x = Phaser.Math.Between(xoffset, scene.scale.width - xoffset);
                 const y = Phaser.Math.Between(yoffset, scene.scale.height - yoffset);
@@ -161,7 +188,11 @@ function App ()
                 ctx.textAlign = "center";
                 ctx.fillText(`${hitBeats.size} / ${hitBeats.size + missedBeats.size} hits`, canvas.width/2, 55);
                 if(lyricsRef.current) {
+                    beatMonsterMap = {}
                     scene.win();
+                    EventBus.once('start-rhythm-game', (ld, s) => {
+                        startRhythmGame(ld, s);
+                    });
                     lyricsRef.current.textContent = "YOU WIN!"
                 };
                 return;
@@ -225,7 +256,7 @@ function App ()
                         }
                     }
                 });
-
+                
                 for(const [beatStr, duration] of Object.entries(levelData.holdBeats)){
                     const beat = parseFloat(beatStr);
                     if(t-beat>-0.1 && t-beat<duration && !hitBeats.has(beat)){
@@ -236,15 +267,14 @@ function App ()
                         }
                     }
                 }
-
+                
                 if(now-lastTriggerTime>100){
                     lastTriggerTime=now;
                     const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, 0.5);
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
                     if(onBeat && !isHoldBeat){
                         const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
-                        // beatMonsterMap[hitBeat].onHit()
-                        delete beatMonsterMap[hitBeat]
+                        beatMonsterMap[hitBeat].onHit()
                         hitBeats.add(hitBeat);
                         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
                     }
