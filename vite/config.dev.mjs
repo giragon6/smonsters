@@ -9,5 +9,13 @@ export default defineConfig({
     ],
     server: {
         port: 8080
+    },
+    esbuild: {
+        supported: {
+        'top-level-await': true
+        },
+    },  
+    build: {
+        target: 'es2022',
     }
 })

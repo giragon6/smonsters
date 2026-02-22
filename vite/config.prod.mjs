@@ -25,9 +25,14 @@ export default defineConfig({
     ],
     esbuild: {
         supported: {
-        'top-level-await': true //browsers can handle top-level-await features
+        'top-level-await': true
         },
     },  
+      optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext'
+    }
+  },
     logLevel: 'warning',
     build: {
         rollupOptions: {
@@ -37,6 +42,7 @@ export default defineConfig({
                 }
             }
         },
+        target: 'es2022',
         minify: 'terser',
         terserOptions: {
             compress: {
