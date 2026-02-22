@@ -25,12 +25,8 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
     this.logsKey = logsKey;
 
     EventBus.on('damage-taken', (damage) => this.onDamage(damage));
-  }
-
-  create() {
-    this.play(this.animKey);
+    this.play('cute-campfire-crackle');
     const logs = scene.add.sprite(x, y, this.logsKey);
     logs.scale = this.scale;
   }
-
 }
