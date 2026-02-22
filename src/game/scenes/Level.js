@@ -57,8 +57,31 @@ export class Level extends Scene
 
         EventBus.emit('bg-music-pause');
         EventBus.on('game-over', this.handleGameOver, this);
+        EventBus.on('glitch-effect', this.runGlitchEffect, this);
+        this.events.once('shutdown', () => EventBus.off('glitch-effect', this.runGlitchEffect, this));
         EventBus.emit('current-scene-ready', this);
         EventBus.emit('start-rhythm-game', this.levelData, this);
+
+        this.glitchGraphics = this.add.graphics().setDepth(9999);
+    }
+
+    runGlitchEffect() {
+        if (this.phase !== Phases.EERIE && this.phase !== Phases.CREEPY) return;
+        const w = this.scale.width;
+        const h = this.scale.height;
+        this.cameras.main.shake(200, 0.015);
+        this.glitchGraphics.clear();
+        this.glitchGraphics.lineStyle(0, 0x000000, 0);
+        for (let i = 0; i < 2500; i++) {
+            const x = Phaser.Math.Between(0, w);
+            const y = Phaser.Math.Between(0, h);
+            const s = Phaser.Math.Between(1, 3);
+            const g = Phaser.Math.Between(0, 255);
+            this.glitchGraphics.fillStyle((g << 16) | (g << 8) | g, 0.9);
+            this.glitchGraphics.fillRect(x, y, s, s);
+        }
+        this.glitchGraphics.setAlpha(0.5);
+        this.tweens.add({ targets: this.glitchGraphics, alpha: 0, duration: 180, ease: 'Power2' });
     }
 
     addMonster(

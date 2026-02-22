@@ -170,6 +170,9 @@ function App ()
                 missedBeats.add(missedBeat);
                 const monster = beatMonsterMap[missedBeat];
                 EventBus.emit('missed-beats', missedBeats.size);
+                if (levelData.phase === 'eerie' || levelData.phase === 'creepy') {
+                    EventBus.emit('glitch-effect');
+                }
                 monster.destroy();
                 lastCheckedBeat = missedBeat;
                 console.log('Misses:', missedBeats.size, '/', levelData.maxMissed);
