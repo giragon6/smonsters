@@ -281,9 +281,13 @@ function App ()
         
 
         function addHitBeat(beat) {
+            if (hitBeats.has(beat)) return;
             hitBeats.add(beat);
             const monster = beatMonsterMap[beat];
-            monster.destroy();
+            if (monster) {
+                monster.destroy();
+                delete beatMonsterMap[beat];
+            }
         }
 
         //debug
