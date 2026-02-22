@@ -2,7 +2,6 @@ TODO ADISHREE:
 - text on screen for hits or other effects?
 
 if time:
-- sync w spotify
 - multiplayer / leaderboard
 - cuter ui
 

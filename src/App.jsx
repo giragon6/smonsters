@@ -54,9 +54,9 @@ function App ()
 
     //start game
     let keyListener = null;
+    let currentMicLoop = null;
     async function startRhythmGame(levelData, scene) {
         isGameOver = false;
-        console.log('starting......')
         const hitBeats = new Set();
         const missedBeats = new Set();
         //restart
@@ -197,15 +197,30 @@ function App ()
         const getVolume = await getOrInitMic();
         let lastTriggerTime = 0;
         
+        //debug
+        if(currentMicLoop) {
+            EventBus.off('volume-detect', currentMicLoop);
+            currentMicLoop = null;
+        }
         function micLoop(volume){
             const now=Date.now();
             const t= audio.currentTime;
-            // console.log(volume)
             if(volume>VOL_THRESHOLD) {
+                levelData.beats.forEach(beat => {
+                    if(hitBeats.has(beat)) return;
+                    if(t-beat>-0.1 && t-beat<0.5){
+                        const isHoldBeat=levelData.holdBeats[beat] !== undefined;
+                        if(!isHoldBeat){
+                            hitBeats.add(beat);
+                            console.log('HIT!', beat.toFixed(2));
+                        }
+                    }
+                });
+
                 for(const [beatStr, duration] of Object.entries(levelData.holdBeats)){
                     const beat = parseFloat(beatStr);
-                    if(Math.abs(t-beat) < duration && !hitBeats.has(beat)){
-                        holdProgress[beat] = (holdProgress[beat] || 0) + (1/60);
+                    if(t-beat>-0.1 && t-beat<duration && !hitBeats.has(beat)){
+                        holdProgress[beat] = (holdProgress[beat] || 0) + (VOLUME_DETECT_THROTTLE/1000);
                         if(holdProgress[beat] >= duration){
                             hitBeats.add(beat);
                             console.log(`HOLD HIT! beat=${beat}, duration=${duration}s`);
@@ -213,7 +228,7 @@ function App ()
                     }
                 }
 
-                if(now-lastTriggerTime>200){
+                if(now-lastTriggerTime>100){
                     lastTriggerTime=now;
                     const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, 0.5);
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
@@ -231,7 +246,8 @@ function App ()
                 }
             }
         }
-        EventBus.on('volume-detect', micLoop);
+        currentMicLoop=micLoop;
+        EventBus.on('volume-detect', micLoop)
     }
 
     return (
