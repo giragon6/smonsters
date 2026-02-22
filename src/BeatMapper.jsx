@@ -1,6 +1,6 @@
-const audio = new Audio("/badguy.mp3");
+const audio = new Audio("/americanboy.mp3");
 const beats = [];
-audio.currentTime = 48;
+audio.currentTime = 15;
 audio.play();
 
 document.addEventListener("keydown", function(e) {

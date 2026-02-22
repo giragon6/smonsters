@@ -9,8 +9,9 @@ export class Preloader extends Scene
         super('Preloader');
     }
 
-    init ()
+    init (data)
     {
+        this.skipToLevel = data && data.skipToLevel;
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'background');
         this.add.rectangle(this.scale.width / 2, this.scale.height / 2, 468, 32).setStrokeStyle(1, 0xffffff);
         const bar = this.add.rectangle(this.scale.width / 2 - 230, this.scale.height / 2, 4, 28, 0xffffff);
@@ -74,6 +75,11 @@ export class Preloader extends Scene
             frameRate: 6,
             repeat: -1
         })
+
+        if (this.skipToLevel) {
+            this.scene.start(this.skipToLevel);
+            return;
+        }
 
         const goToCutePhase = () => this.scene.start('SelectLevel' + Phases.CUTE.toUpperCase());
         if (this.cache.video.exists('introCutscene')) {

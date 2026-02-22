@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 
+const TESTING_SKIP_TO_LEVEL = null;
+
 export class Boot extends Scene
 {
     constructor ()
@@ -9,16 +11,18 @@ export class Boot extends Scene
 
     preload ()
     {
-        //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
-        //  The smaller the file size of the assets, the better, as the Boot Scene itself has no preloader.
-
         this.load.image('background', 'assets/bg.png');
         this.load.image('background-no-fire', 'assets/bg-no-fire.png');
         this.load.image('title', 'assets/title.jpg');
+        this.load.image('title2', 'assets/title2.jpg');
     }
 
     create ()
     {
-        this.scene.start('BeginStory');
+        if (TESTING_SKIP_TO_LEVEL) {
+            this.scene.start('Preloader', { skipToLevel: TESTING_SKIP_TO_LEVEL });
+        } else {
+            this.scene.start('BeginStory');
+        }
     }
 }
