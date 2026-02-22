@@ -44,7 +44,7 @@ function App ()
         });
     }, [])
 
-    const VOL_THRESHOLD = 0.5;
+    const VOL_THRESHOLD = 0.1;
     const DEFAULT_DURATION = 0.5;
     const BEAT_WINDOW = 0.5; 
 
