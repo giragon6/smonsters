@@ -13,10 +13,9 @@ export class PhaseTransition extends Scene {
 
     create() {
         this.cameras.main.setBackgroundColor(0x000000);
+        EventBus.emit('bg-music-play');
         if (this.videoKey === 'afterEerie') {
-            EventBus.emit('bg-music-pause');
-        } else {
-            EventBus.emit('bg-music-play');
+            this.time.delayedCall(2000, () => EventBus.emit('bg-music-pause'));
         }
 
         const goToNext = () => this.scene.start(this.nextScene);
