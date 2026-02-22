@@ -11,6 +11,7 @@ export class GameEnd extends Scene
     create ()
     {
         this.cameras.main.setBackgroundColor(0x000000);
+        EventBus.emit('bg-music-play');
 
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'creepy-bg').setAlpha(0.5);
 
