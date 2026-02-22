@@ -74,8 +74,9 @@ function App ()
         });
     }, [])
 
-    const VOL_THRESHOLD = 0.05;
-    const BEAT_WINDOW = 0.1; 
+    const VOL_THRESHOLD = 0.03;   // lower = quieter singing still counts
+    const BEAT_WINDOW = 0.55;     // seconds of wiggle room for being "on beat"
+    const BEAT_RECT_WIDTH = 24;   // pixel width of each beat rect (visual only, independent of BEAT_WINDOW) 
 
     //check if on beat
     function isOnBeat(levelData, audioCurrentTime, beats, window = BEAT_WINDOW){
@@ -246,12 +247,12 @@ function App ()
                     if(x < -20 || x > canvas.width + 20) return;
                     
                     const holdDuration = levelData.holdBeats[beat];
-                    const width = holdDuration?holdDuration*PIXELS_PER_SEC : BEAT_WINDOW*PIXELS_PER_SEC;
+                    const width = holdDuration ? holdDuration * PIXELS_PER_SEC : BEAT_RECT_WIDTH;
 
                     if(hitBeats.has(beat)) ctx.fillStyle = "#0f0";
                     else if(missedBeats.has(beat)) ctx.fillStyle = "#f00";
                     else ctx.fillStyle = "#fff";
-                    ctx.fillRect(x-10, 10, width, 60);
+                    ctx.fillRect(x - width / 2, 10, width, 60);
                 });
                 ctx.strokeStyle="white";
                 ctx.lineWidth=2;
@@ -326,7 +327,7 @@ function App ()
                     const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, BEAT_WINDOW);
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < BEAT_WINDOW);
                     if(onBeat && !isHoldBeat){
-                        const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
+                        const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < BEAT_WINDOW);
                         addHitBeat(hitBeat);
                         console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
                     }
