@@ -14,7 +14,7 @@ export class SelectLevel extends Scene {
   idx = 0;
   hasFinishedSelection = false; //idek bro
 
-  VOL_THRESHOLD = 0.4;
+  VOL_THRESHOLD = 0.25;
 
   constructor(key)
   {
