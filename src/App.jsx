@@ -17,6 +17,7 @@ function App ()
     const healthRef = useRef(null);
     const hauntedRef = useRef(null);
     const flashRef = useRef(null);
+    const clawRef = useRef(null);
 
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
@@ -45,9 +46,10 @@ function App ()
 
     const VOL_THRESHOLD = 0.5;
     const DEFAULT_DURATION = 0.5;
-        
+    const BEAT_WINDOW = 0.5; 
+
     //check if on beat
-    function isOnBeat(levelData, audioCurrentTime, beats, window=0.5){
+    function isOnBeat(levelData, audioCurrentTime, beats, window = BEAT_WINDOW){
         return levelData.beats.some(beat => Math.abs(audioCurrentTime - beat) < window);
     }
 
@@ -134,7 +136,7 @@ function App ()
         setInterval(() => {
             const t=audio.currentTime;
             const missedBeat = levelData.beats.find(
-                beat => beat > lastCheckedBeat && beat < t - 0.5 && !hitBeats.has(beat)
+                beat => beat > lastCheckedBeat && beat < t - BEAT_WINDOW && !hitBeats.has(beat)
             );
             if(missedBeat){
                 missedBeats.add(missedBeat);
@@ -143,13 +145,13 @@ function App ()
                     EventBus.emit('game-over');
                 }
 
-                if(flashRef.current) {
-                    flashRef.current.style.opacity = '0.3';
+                if(flashRef.current) flashRef.current.style.opacity = '0.3';
+                if(clawRef.current) clawRef.current.style.opacity = '0.8';
                     setTimeout(() => {
                         if(flashRef.current) flashRef.current.style.opacity = '0';
+                        if(clawRef.current) clawRef.current.style.opacity='0';
                     }, 100);
                 }
-            }
         }, 1);
 
         ///canvas constants (for the scrolling rhythm rects)
@@ -239,7 +241,7 @@ function App ()
             if(volume>VOL_THRESHOLD) {
                 levelData.beats.forEach(beat => {
                     if(hitBeats.has(beat)) return;
-                    if(t-beat>-0.1 && t-beat<0.5){
+                    if(t-beat>-0.1 && t-beat<BEAT_WINDOW){
                         const isHoldBeat=levelData.holdBeats[beat] !== undefined;
                         if(!isHoldBeat){
                             hitBeats.add(beat);
@@ -261,10 +263,10 @@ function App ()
 
                 if(now-lastTriggerTime>100){
                     lastTriggerTime=now;
-                    const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, 0.5);
-                    const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
+                    const onBeat=isOnBeat(levelData, audio.currentTime, levelData.beats, BEAT_WINDOW);
+                    const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < BEAT_WINDOW);
                     if(onBeat && !isHoldBeat){
-                        const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
+                        const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < BEAT_WINDOW);
                         const monster = beatMonsterMap[hitBeat];
                         if(monster && !hitBeats.has(hitBeat)){
                             monster.onHit();
@@ -289,8 +291,8 @@ function App ()
             <PhaserGame className="phaserGame" ref={phaserRef} currentActiveScene={currentScene} />
             <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
-            <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
-            <div ref={flashRef} style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', background:'red', opacity:0, pointerEvents:'none',zIndex: 998, transition:'opacity 0.3s'}}/>
+            <div ref={flashRef} style={{position:'fixed', top:0, left:0, width:'100%', height:'calc(100% - 80px)', background:'red', opacity:0, pointerEvents:'none',zIndex: 998, transition:'opacity 0.3s'}}/>
+            <img ref={clawRef} src="/assets/claw.png" style={{position:'fixed', top:0, left:0, width:'100%', height:'calc(100% -150px)', objectFit:'cover', opacity:0,pointerEvents:'none', zIndex:999, transition: 'opacity 0.3s'}}></img>
         </div>
     )
 }

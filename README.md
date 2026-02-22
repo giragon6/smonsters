@@ -5,7 +5,6 @@ TODO ADISHREE:
 
 if time:
 - multiplayer / leaderboard
-- cuter ui
 
 # Phaser React Template
 
