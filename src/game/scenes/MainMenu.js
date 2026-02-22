@@ -5,6 +5,7 @@ import { Phases } from './Level.js';
 export class MainMenu extends Scene
 {
     logoTween;
+    VOL_THRESHOLD = 0.1;
 
     constructor ()
     {

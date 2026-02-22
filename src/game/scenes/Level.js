@@ -12,7 +12,6 @@ export const Phases = Object.freeze({
 
 export class Level extends Scene
 {    
-    health = 100;
     phase;
     campfire;
 
@@ -38,17 +37,15 @@ export class Level extends Scene
 
     create ()
     {
-        this.add.image(this.scale.width / 2, this.scale.height / 2, 'background-no-fire');
+        this.add.image(this.scale.width / 2, this.scale.height / 2, this.phase !== Phases.CREEPY ? 'background-no-fire' : 'creepy-bg');
         
-        console.log(Math.round(this.levelData.beats.length * 0.75) * Monster.damage)
-
         this.campfire = new Campfire(
             this, 
             this.scale.width / 2, 
             this.scale.height / 2, 
             0.7, 
             this.fireAssetKey, 
-            this.fireAnimKey, 
+            this.phase === Phases.CREEPY ? null : this.fireAnimKey, 
             this.logsKey,
             Math.round(this.levelData.beats.length * 0.75) * Monster.damage //need to get 75% beats
         );
@@ -79,7 +76,7 @@ export class Level extends Scene
             x, 
             y, 
             this.monsterAssetKey, 
-            this.monsterAnimKey,
+            this.phase === Phases.CREEPY ? null : this.monsterAnimKey,
             beat,
             duration,
             appearOffset,
@@ -89,7 +86,7 @@ export class Level extends Scene
             scaleInitial,
             scaleFinal
         )
-        this.monsters.add(monster);
+        this.monsters.add(monster, true);
         monster.depth = 100;
         return monster;
     }
@@ -101,19 +98,18 @@ export class Level extends Scene
 
     gameOver()
     {
-        this.monsters.clear(false, true);
         this.scene.start('GameOver');
     }
 
     win()
     {
+        this.campfire.onWin();
         if (this.phase == Phases.CUTE) {
             this.scene.start('SelectLevel'+Phases.EERIE.toUpperCase())
         } else if (this.phase == Phases.EERIE) {
             this.scene.start('SelectLevel'+Phases.CREEPY.toUpperCase())
         } else {
-            //unimplemented
-            this.scene.start('GameOver');
+            this.scene.start('GameEnd');
         }
     }
 }
