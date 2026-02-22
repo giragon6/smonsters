@@ -135,14 +135,13 @@ export const levels = {
             29.426: 0.2
         },
         lyrics: [
-            { t: 10,  text: "I hopped off the plane at LAX" },
-            { t: 12,  text: "With a dream and a cardigan" },
-            { t: 15,  text: "Welcome to the land of fame excess" },
-            { t: 18, text: "Am I gonna fit in?" },
-            { t: 20, text: "Jumped in the cab, here I am for the first time"},
-            { t: 23, text: "Look to my right and I see the Hollywood sign" },
-            { t: 25, text: "This is all so crazy" },
-            { t: 27, text: "Everybody seems so famous" }
+            {t: 200, text: "You're here, "},
+            {t: 209, text: "There's nothing I fear"},
+            {t:213, text: "And I know that my heart will go on"},
+            {t: 223, text: "We'll stay"},
+            {t: 229, text: "Forever this way"},
+            {t: 233, text: "You are safe in my heart and"},
+            {t: 238, text: "My heart will go on and on"}
         ]
     },
     badguy:{

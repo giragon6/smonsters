@@ -14,7 +14,7 @@ if (!DEBUG) {
 
 
 function App ()
-{
+{    
     if (DEBUG) {
         let curVol = 0.05;
         function getVolume() {
@@ -39,7 +39,9 @@ function App ()
 
     //set up level / song
     const lyricsRef = useRef();
+    if (lyricsRef.current) lyricsRef.current.textContent = "";
     const canvasRef = useRef();
+    const rhythmGameActiveRef = useRef(false);
     const audioRef = useRef(null);
     let isGameOver = true;
     const healthRef = useRef(null);
@@ -84,6 +86,7 @@ function App ()
     let keyListener = null;
     let currentMicLoop = null;
     async function startRhythmGame(levelData, scene) {
+        rhythmGameActiveRef.current = false; // stop any previous draw loop
         isGameOver = false;
         const hitBeats = new Set();
         const missedBeats = new Set();
@@ -105,6 +108,7 @@ function App ()
             setTimeout(() => hauntedAudio.pause(), 30000);
         }
         if(lyricsRef.current) lyricsRef.current.textContent = "";
+        rhythmGameActiveRef.current = true;
         const audio = new Audio(levelData.audio);
         audioRef.current = audio;
         audio.currentTime = levelData.start;
@@ -150,17 +154,23 @@ function App ()
 
         EventBus.on('game-over', gameOver);
         function gameOver() {
+            rhythmGameActiveRef.current = false;
+            if (missedIntervalId != null) clearInterval(missedIntervalId);
             beatMonsterMap = {}
             isGameOver = true;
             audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
+            if(canvasRef.current) {
+                const ctx2 = canvasRef.current.getContext("2d");
+                if(ctx2) ctx2.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            }
             EventBus.once('start-rhythm-game', async (levelData, scene) => await startRhythmGame(levelData, scene));
         }
 
 
         //missed rects
         let lastCheckedBeat =0;
-        setInterval(() => {
+        let missedIntervalId = setInterval(() => {
             const t=audio.currentTime;
             const missedBeat = levelData.beats.find(
                 beat => beat > lastCheckedBeat && beat < t - BEAT_WINDOW && !hitBeats.has(beat)
@@ -171,17 +181,20 @@ function App ()
                 EventBus.emit('missed-beats', missedBeats.size);
                 monster.destroy();
                 lastCheckedBeat = missedBeat;
-                if (missedBeats.size > levelData.maxMissed) {
+                console.log('Misses:', missedBeats.size, '/', levelData.maxMissed);
+                // Health reaches 0 exactly when misses = maxMissed (damage per miss = 100/maxMissed)
+                const damage = 100 / levelData.maxMissed;
+                EventBus.emit('damage-taken', damage);
+                if (missedBeats.size >= levelData.maxMissed) {
                     EventBus.emit('game-over');
                 }
-
                 if(flashRef.current) flashRef.current.style.opacity = '0.3';
                 if(clawRef.current) clawRef.current.style.opacity = '0.8';
-                    setTimeout(() => {
-                        if(flashRef.current) flashRef.current.style.opacity = '0';
-                        if(clawRef.current) clawRef.current.style.opacity='0';
-                    }, 100);
-                }
+                setTimeout(() => {
+                    if(flashRef.current) flashRef.current.style.opacity = '0';
+                    if(clawRef.current) clawRef.current.style.opacity='0';
+                }, 100);
+            }
         }, 1);
 
         ///canvas constants (for the scrolling rhythm rects)
@@ -193,6 +206,7 @@ function App ()
 
         //draw rhythm rects
         function drawBeats() {
+            if (!rhythmGameActiveRef.current) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const elapsed = (Date.now() - gameStartTime) / 1000;
             const t = audio.currentTime;
@@ -215,13 +229,15 @@ function App ()
                 ctx.textAlign = "center";
                 ctx.fillText(`${hitBeats.size} / ${hitBeats.size + missedBeats.size} hits`, canvas.width/2, 55);
                 if(lyricsRef.current) {
-                    beatMonsterMap = {}
+                    rhythmGameActiveRef.current = false;
+                    if (missedIntervalId != null) clearInterval(missedIntervalId);
+                    if(lyricsRef.current) lyricsRef.current.textContent = "";
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    EventBus.off('volume-detect', currentMicLoop);
+                    beatMonsterMap = {};
+                    EventBus.once('start-rhythm-game', (ld, s) => startRhythmGame(ld, s));
                     scene.win();
-                    EventBus.once('start-rhythm-game', (ld, s) => {
-                        startRhythmGame(ld, s);
-                    });
-                    lyricsRef.current.textContent = "YOU WIN!"
-                };
+                }
                 return;
             } else{
                 levelData.beats.forEach(beat => {
@@ -250,7 +266,7 @@ function App ()
                 }
             }
 
-            requestAnimationFrame(drawBeats);
+            if (rhythmGameActiveRef.current) requestAnimationFrame(drawBeats);
         }
         drawBeats();
 
@@ -264,9 +280,13 @@ function App ()
         
 
         function addHitBeat(beat) {
+            if (hitBeats.has(beat)) return;
             hitBeats.add(beat);
             const monster = beatMonsterMap[beat];
-            if (monster) monster.destroy();
+            if (monster) {
+                monster.destroy();
+                delete beatMonsterMap[beat];
+            }
         }
 
         //debug
