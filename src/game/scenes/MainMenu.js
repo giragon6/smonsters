@@ -12,10 +12,8 @@ export class MainMenu extends Scene
     }
 
     checkVol(volume) {
-        // if (volume > 0.1) {
-            this.scene.start('SelectLevel'+Phases.CUTE.toUpperCase());
-            EventBus.off('volume-detect', null, this);
-        // }
+        this.scene.start('BeginStory');
+        EventBus.off('volume-detect', null, this);
     }
 
     create ()
