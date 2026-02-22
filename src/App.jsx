@@ -5,7 +5,7 @@ import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus.js';
 
-const DEBUG = true;
+const DEBUG = false;
 
 let getVol;
 if (!DEBUG) {
