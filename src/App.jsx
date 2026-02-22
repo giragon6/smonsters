@@ -5,10 +5,11 @@ import { getOrInitMic } from './util/microphone.js';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus.js';
 
-const DEBUG = true;
+const DEBUG = false;
 
+let getVol;
 if (!DEBUG) {
-    let getVol = await getOrInitMic();
+    getVol = await getOrInitMic();
 }
 
 
@@ -16,9 +17,10 @@ function App ()
 {
     if (DEBUG) {
         let curVol = 0.05;
-        function getVol() {
+        function getVolume() {
             return curVol;
         }
+        getVol = getVolume;
         const handleKeyDown = (e) => {
             if (e.key === 'v') {
                 e.preventDefault()
