@@ -9,10 +9,7 @@ export default class Campfire extends Phaser.GameObjects.Sprite {
 
   onDamage(damage) {
     this.health -= Number(damage);
-    if (this.health <= 0) {
-      EventBus.emit('game-over');
-      this.destroy();
-    }
+    if (this.health < 0) this.health = 0;
     this.alpha = this.health / this.maxHealth;
   }
 

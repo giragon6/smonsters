@@ -57,6 +57,7 @@ export class Level extends Scene
 
         this.monsters = this.add.group({ runChildUpdate: true });
 
+        EventBus.on('game-over', this.handleGameOver, this);
         EventBus.emit('current-scene-ready', this);
         EventBus.emit('start-rhythm-game', this.levelData, this);
     }
@@ -91,6 +92,11 @@ export class Level extends Scene
         this.monsters.add(monster);
         monster.depth = 100;
         return monster;
+    }
+
+    handleGameOver() {
+        EventBus.off('game-over', this.handleGameOver, this);
+        this.gameOver();
     }
 
     gameOver()

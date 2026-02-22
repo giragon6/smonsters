@@ -1,5 +1,7 @@
 TODO ADISHREE:
 - text on screen for hits or other effects?
+-when user screams whe not supposd to
+- fix hold notes
 
 if time:
 - multiplayer / leaderboard

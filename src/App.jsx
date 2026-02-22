@@ -14,7 +14,10 @@ function App ()
     const canvasRef = useRef();
     const audioRef = useRef(null);
     let isGameOver = true;
-    
+    const healthRef = useRef(null);
+    const hauntedRef = useRef(null);
+    const flashRef = useRef(null);
+
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
     
@@ -40,7 +43,7 @@ function App ()
         });
     }, [])
 
-    const VOL_THRESHOLD = 0.1;
+    const VOL_THRESHOLD = 0.5;
     const DEFAULT_DURATION = 0.5;
         
     //check if on beat
@@ -59,6 +62,18 @@ function App ()
         if(audioRef.current){
             audioRef.current.pause();
             audioRef.current = null;
+        }
+        if(levelData.phase==="creepy"){
+            if(hauntedRef.current){
+                hauntedRef.current.pause();
+                hauntedRef.current = null;
+            }
+            const hauntedAudio = new Audio("/haunted.mp3");
+            hauntedRef.current = hauntedAudio;
+            hauntedAudio.currentTime=50;
+            hauntedAudio.play();
+            console.log("haunted audio playing")
+            setTimeout(() => hauntedAudio.pause(), 30000);
         }
         if(lyricsRef.current) lyricsRef.current.textContent = "";
         const audio = new Audio(levelData.audio);
@@ -110,10 +125,7 @@ function App ()
             isGameOver = true;
             audio.pause();
             if(lyricsRef.current) lyricsRef.current.textContent = "GAME OVER!";
-            scene.gameOver();
-            EventBus.once('start-rhythm-game', (ld, s) => {
-                startRhythmGame(ld, s);
-            });
+            EventBus.once('start-rhythm-game', async (levelData, scene) => await startRhythmGame(levelData, scene));
         }
 
 
@@ -127,6 +139,16 @@ function App ()
             if(missedBeat){
                 missedBeats.add(missedBeat);
                 lastCheckedBeat = missedBeat;
+                if (missedBeats.size > levelData.maxMissed) {
+                    EventBus.emit('game-over');
+                }
+
+                if(flashRef.current) {
+                    flashRef.current.style.opacity = '0.3';
+                    setTimeout(() => {
+                        if(flashRef.current) flashRef.current.style.opacity = '0';
+                    }, 100);
+                }
             }
         }, 1);
 
@@ -243,10 +265,13 @@ function App ()
                     const isHoldBeat = Object.keys(levelData.holdBeats).some(b => Math.abs(t - parseFloat(b)) < 0.5);
                     if(onBeat && !isHoldBeat){
                         const hitBeat = levelData.beats.find(beat => Math.abs(audio.currentTime - beat) < 0.5);
-                        // beatMonsterMap[hitBeat].onHit()
-                        delete beatMonsterMap[hitBeat]
-                        hitBeats.add(hitBeat);
-                        console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
+                        const monster = beatMonsterMap[hitBeat];
+                        if(monster && !hitBeats.has(hitBeat)){
+                            monster.onHit();
+                            delete beatMonsterMap[hitBeat];
+                            hitBeats.add(hitBeat);
+                            console.log(onBeat ? "HIT!" : "MISS!", "t=", audio.currentTime.toFixed(2));
+                        }
                     }
                 }
             } else {
@@ -265,6 +290,7 @@ function App ()
             <canvas ref={canvasRef} style={{zIndex: 1, position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'rgba(255, 255, 255, 0.3)'}}/>
             <div ref={lyricsRef} style={{position: 'fixed', bottom:80, left:0, width:'100%', background:'#111', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize: 32, fontWeight: 'bold', padding: '8px 0'}}/>
             <canvas ref={canvasRef} style={{position: 'fixed', bottom:0, left:0, width:'100%', height:'80px', background:'#111'}}/>
+            <div ref={flashRef} style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', background:'red', opacity:0, pointerEvents:'none',zIndex: 998, transition:'opacity 0.3s'}}/>
         </div>
     )
 }
