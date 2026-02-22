@@ -2,6 +2,7 @@ import { Boot } from './scenes/Boot';
 import { Level, Phases } from './scenes/Level';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
+import { GameEnd } from './scenes/GameEnd';
 import Phaser from 'phaser';
 import { Preloader } from './scenes/Preloader';
 import { levels } from '../levels'
@@ -20,7 +21,8 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
-        GameOver
+        GameOver,
+        GameEnd
     ],
     scale: {
         mode: Phaser.Scale.FIT,

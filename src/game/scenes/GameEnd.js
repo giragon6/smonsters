@@ -1,20 +1,20 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 
-export class GameOver extends Scene
+export class GameEnd extends Scene
 {
     constructor ()
     {
-        super('GameOver');
+        super('GameEnd');
     }
 
     create ()
     {
         this.cameras.main.setBackgroundColor(0x000000);
 
-        this.add.image(this.scale.width / 2, this.scale.height / 2, 'background-no-fire').setAlpha(0.5);
+        this.add.image(this.scale.width / 2, this.scale.height / 2, 'creepy-bg').setAlpha(0.5);
 
-        this.add.text(this.scale.width / 2, this.scale.height / 2, 'You lost.', {
+        this.add.text(this.scale.width / 2, this.scale.height / 2, 'Congratulations. You won.', {
             fontFamily: 'Arial Black', fontSize: 64, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'

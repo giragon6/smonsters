@@ -45,7 +45,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
 
     this.isHit = false;
 
-    this.play(this.animKey);
+    if (this.animKey) this.play(this.animKey);
     this.setVisible(false);
 
     this.scale = this.scaleInitial;

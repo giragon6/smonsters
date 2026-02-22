@@ -40,6 +40,10 @@ export class Preloader extends Scene
         this.load.spritesheet('eerie-monster', 'eerie_monster.png', { frameWidth: 2048, frameHeight: 2048});
         this.load.spritesheet('eerie-campfire', 'eerie_campfire.png',{ frameWidth: 2048, frameHeight: 2048 } )
         this.load.image('eerie-logs', 'eerie_logs.png');
+        this.load.image('creepy-campfire', 'creepy_campfire.png');
+        this.load.image('creepy-logs', 'creepy_campfire.png');
+        this.load.image('creepy-monster', 'creepy_monster.png');
+        this.load.image('creepy-bg', 'creepy_bg.png');
     }
 
     create ()
