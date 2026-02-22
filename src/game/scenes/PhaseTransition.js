@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { EventBus } from '../EventBus.js';
 
 export class PhaseTransition extends Scene {
     constructor() {
@@ -12,6 +13,11 @@ export class PhaseTransition extends Scene {
 
     create() {
         this.cameras.main.setBackgroundColor(0x000000);
+        if (this.videoKey === 'afterEerie') {
+            EventBus.emit('bg-music-pause');
+        } else {
+            EventBus.emit('bg-music-play');
+        }
 
         const goToNext = () => this.scene.start(this.nextScene);
 

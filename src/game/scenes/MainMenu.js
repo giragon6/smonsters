@@ -27,8 +27,8 @@ export class MainMenu extends Scene
         }).setDepth(100).setOrigin(0.5);
 
 
+        EventBus.emit('bg-music-play');
         EventBus.on('volume-detect', (v) => this.checkVol(v));
-        
         EventBus.emit('current-scene-ready', this);
     }
 

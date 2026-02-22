@@ -23,6 +23,7 @@ export class SelectLevel extends Scene {
 
   create()
   {
+    EventBus.emit('bg-music-play');
     this.add.image(this.scale.width / 2, this.scale.height / 2, 'background');
     this.phaseLevelData = Object.values(levels).filter((level) => level['phase'].toLowerCase() == this.phase.toLowerCase());
     const levelLabels = this.add.group();

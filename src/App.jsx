@@ -22,6 +22,7 @@ function App ()
     const hauntedRef = useRef(null);
     const flashRef = useRef(null);
     const clawRef = useRef(null);
+    const bgMusicRef = useRef(null);
 
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
@@ -30,6 +31,21 @@ function App ()
     }
 
     const VOLUME_DETECT_THROTTLE = 100; //ms
+
+// bg music
+    useEffect(() => {
+        const bg = new Audio("/bg_music.mp3");
+        bg.loop = true;
+        bgMusicRef.current = bg;
+        const onPlay = () => { bg.play().catch(() => {}); };
+        const onPause = () => { bg.pause(); };
+        EventBus.on('bg-music-play', onPlay);
+        EventBus.on('bg-music-pause', onPause);
+        return () => {
+            EventBus.off('bg-music-play', onPlay);
+            EventBus.off('bg-music-pause', onPause);
+        };
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -48,9 +64,9 @@ function App ()
         });
     }, [])
 
-    const VOL_THRESHOLD = 0.03;   // lower = quieter singing still counts
-    const BEAT_WINDOW = 0.55;     // seconds of wiggle room for being "on beat"
-    const BEAT_RECT_WIDTH = 24;   // pixel width of each beat rect (visual only, independent of BEAT_WINDOW) 
+    const VOL_THRESHOLD = 0.03;  
+    const BEAT_WINDOW = 0.55;     
+    const BEAT_RECT_WIDTH = 24; 
 
     //check if on beat
     function isOnBeat(levelData, audioCurrentTime, beats, window = BEAT_WINDOW){
@@ -61,7 +77,7 @@ function App ()
     let keyListener = null;
     let currentMicLoop = null;
     async function startRhythmGame(levelData, scene) {
-        rhythmGameActiveRef.current = false; // stop any previous draw loop
+        rhythmGameActiveRef.current = false;
         isGameOver = false;
         const hitBeats = new Set();
         const missedBeats = new Set();

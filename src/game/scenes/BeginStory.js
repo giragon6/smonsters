@@ -24,6 +24,7 @@ export class BeginStory extends Scene
             align: 'center'
         }).setOrigin(0.5).setDepth(100);
 
+        EventBus.emit('bg-music-play');
         EventBus.on('volume-detect', (v) => this.checkVol(v));
         EventBus.emit('current-scene-ready', this);
     }
