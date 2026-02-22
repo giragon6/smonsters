@@ -9,12 +9,13 @@ import { levels } from '../levels'
 import { toLevelKey } from '../util/format';
 import { SelectLevel } from './scenes/SelectLevel';
 import { BeginStory } from './scenes/BeginStory';
+import { PhaseTransition } from './scenes/PhaseTransition';
 
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: Phaser.AUTO,
-    width: 2244,
+    width: 2244, 
     height: 1452,
     parent: 'game-container',
     backgroundColor: '#028af8',
@@ -23,6 +24,7 @@ const config = {
         Preloader,
         BeginStory,
         MainMenu,
+        PhaseTransition,
         GameOver,
         GameEnd
     ],

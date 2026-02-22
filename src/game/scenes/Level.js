@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import Campfire from '../gameobjects/campfire/Campfire.js';
 import Monster from '../gameobjects/monster/Monster.js';
 import { toLevelKey } from '../../util/format.js';
+import { levels } from '../../levels.js';
 
 export const Phases = Object.freeze({
     CUTE: 'cute',
@@ -104,9 +105,11 @@ export class Level extends Scene
     {
         this.campfire.onWin();
         if (this.phase == Phases.CUTE) {
-            this.scene.start('SelectLevel'+Phases.EERIE.toUpperCase())
+            this.scene.start('PhaseTransition', { videoKey: 'afterCute', nextScene: 'SelectLevel' + Phases.EERIE.toUpperCase() });
         } else if (this.phase == Phases.EERIE) {
-            this.scene.start('SelectLevel'+Phases.CREEPY.toUpperCase())
+            const creepyLevel = Object.values(levels).find(l => l.phase === Phases.CREEPY || l.phase === 'creepy');
+            const nextScene = creepyLevel ? toLevelKey(creepyLevel.song) : 'GameEnd';
+            this.scene.start('PhaseTransition', { videoKey: 'afterEerie', nextScene });
         } else {
             this.scene.start('GameEnd');
         }

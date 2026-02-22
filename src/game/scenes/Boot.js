@@ -14,10 +14,11 @@ export class Boot extends Scene
 
         this.load.image('background', 'assets/bg.png');
         this.load.image('background-no-fire', 'assets/bg-no-fire.png');
+        this.load.image('title', 'assets/title.jpg');
     }
 
     create ()
     {
-        this.scene.start('Preloader');
+        this.scene.start('BeginStory');
     }
 }

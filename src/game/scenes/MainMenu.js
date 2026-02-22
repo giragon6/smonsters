@@ -4,7 +4,6 @@ import { Phases } from './Level.js';
 
 export class MainMenu extends Scene
 {
-    logoTween;
     VOL_THRESHOLD = 0.1;
 
     constructor ()
@@ -20,8 +19,6 @@ export class MainMenu extends Scene
     create ()
     {
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'background');
-        
-        this.logo = this.add.image(this.scale.width / 2, this.scale.height / 2, 'logo').setDepth(100);
         
         this.add.text(this.scale.width / 2, this.scale.height / 2 + 150, 'SCREAM TO START', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
