@@ -8,6 +8,7 @@ import { Preloader } from './scenes/Preloader';
 import { levels } from '../levels'
 import { toLevelKey } from '../util/format';
 import { SelectLevel } from './scenes/SelectLevel';
+import { BeginStory } from './scenes/BeginStory';
 
 // Find out more information about the Game Config at:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -20,6 +21,7 @@ const config = {
     scene: [
         Boot,
         Preloader,
+        BeginStory,
         MainMenu,
         GameOver,
         GameEnd

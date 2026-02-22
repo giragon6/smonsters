@@ -1,9 +1,9 @@
 TODO ADISHREE:
 - text on screen for hits or other effects?
+-when user screams whe not supposd to
 
 if time:
 - multiplayer / leaderboard
-- cuter ui
 
 # Phaser React Template
 

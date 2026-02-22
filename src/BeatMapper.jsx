@@ -1,6 +1,6 @@
-const audio = new Audio("/hangingtree.mp3");
+const audio = new Audio("/beautyandabeat.mp3");
 const beats = [];
-audio.currentTime = 85;
+audio.currentTime = 134;
 audio.play();
 
 document.addEventListener("keydown", function(e) {
