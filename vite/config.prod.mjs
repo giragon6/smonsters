@@ -23,6 +23,11 @@ export default defineConfig({
         react(),
         phasermsg()
     ],
+    esbuild: {
+        supported: {
+        'top-level-await': true //browsers can handle top-level-await features
+        },
+    },  
     logLevel: 'warning',
     build: {
         rollupOptions: {
