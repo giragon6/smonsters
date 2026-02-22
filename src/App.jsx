@@ -7,7 +7,8 @@ import { EventBus } from './game/EventBus.js';
 
 const DEBUG = false;
 
-let getVol = await getOrInitMic();
+let getVol;
+(async () => getVol = await getOrInitMic());
 
 
 function App ()
