@@ -7,36 +7,11 @@ import { EventBus } from './game/EventBus.js';
 
 const DEBUG = false;
 
-let getVol;
-if (!DEBUG) {
-    getVol = await getOrInitMic();
-}
+let getVol = await getOrInitMic();
 
 
 function App ()
 {    
-    if (DEBUG) {
-        let curVol = 0.05;
-        function getVolume() {
-            return curVol;
-        }
-        getVol = getVolume;
-        const handleKeyDown = (e) => {
-            if (e.key === 'v') {
-                e.preventDefault()
-                curVol = 0.95
-            }
-        }
-        const handleKeyUp = (e) => {
-            if (e.key === 'v') {
-                e.preventDefault()
-                curVol = 0.05
-            }
-        }
-        document.body.addEventListener('keydown', handleKeyDown)
-        document.body.addEventListener('keyup', handleKeyUp)
-    }
-
     //set up level / song
     const lyricsRef = useRef();
     if (lyricsRef.current) lyricsRef.current.textContent = "";
