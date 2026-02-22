@@ -47,6 +47,8 @@ export class Preloader extends Scene
         this.load.image('creepy-bg', 'creepy_bg.png');
         this.load.image('title', 'title.jpg');
         this.load.video('introCutscene', 'introCutscene.mp4');
+        this.load.video('afterCute', 'afterCute.mp4');
+        this.load.video('afterEerie', 'afterEerie.mp4');
     }
 
     create ()

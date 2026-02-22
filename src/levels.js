@@ -173,6 +173,7 @@ export const levels = {
         phase: "creepy",
         level: "medium",
         start: 1,
+        maxMissed: 5,
         end: 30,
         beats: [5, 8, 13, 18, 20, 22, 23, 23.5, 24, 24.3, 24.5, 24.65, 24.75, 24.83, 24.9, 24.95, 25],
         holdBeats: {
