@@ -77,7 +77,7 @@ export class Preloader extends Scene
 
         const goToCutePhase = () => this.scene.start('SelectLevel' + Phases.CUTE.toUpperCase());
         if (this.cache.video.exists('introCutscene')) {
-            const SKIP_THRESHOLD = 0.3;
+            const SKIP_THRESHOLD = 0.4;
             const video = this.add.video(this.scale.width / 2, this.scale.height / 2, 'introCutscene');
             video.play();
 

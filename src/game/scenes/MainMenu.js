@@ -4,7 +4,7 @@ import { Phases } from './Level.js';
 
 export class MainMenu extends Scene
 {
-    VOL_THRESHOLD = 0.1;
+    VOL_THRESHOLD = 0.4;
 
     constructor ()
     {
