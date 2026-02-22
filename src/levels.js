@@ -84,6 +84,40 @@ export const levels = {
             {t: 161.5, text: "Buns out, weiner but I gotta keep an eye out for Selener"}
         ]
     },
+    americanboy: {
+        song: "American Boy (Estelle)",
+        phase: Phases.CUTE,
+        audio: "/americanboy.mp3",
+        phase: "cute",
+        level: "medium",
+        start: 12,
+        end: 47,
+        maxMissed: 200,
+        beats: [16.553,16.9,16.936,17.061,17.198,17.387,17.56,17.942,18.379,18.65,18.873,19.124,19.293,19.559,19.717,19.94,20.653,20.953,21.107,21.259,21.403,21.551,21.772,21.972,22.424,22.69,22.944,23.176,23.454,23.703,23.957,25.024,25.475,25.658,25.84,26.053,26.516,26.797,26.949,27.137,27.302,27.463,27.789,28.037,28.537,28.8,29.006,29.34,29.652,30.102,30.602,30.788,31.165,31.411,31.572,31.785,32.27,32.77,32.928,33.155,33.385,33.535,33.826,34.126,34.394,34.659,35.048,35.44,36.631,36.912,37.164,37.389,37.588,37.87,38.136,38.44,38.729,39.126,39.535,40.164,40.748,40.982,41.248,41.521,42.529,42.8,43.04,43.305,43.552,44.784,45.046,45.299,45.569,45.811,46.097,46.27,46.523,46.691],
+        holdBeats: {
+            19.94: 0.5, 
+            23.957: 0.5,
+            35.44: 0.5,
+            41.521: 0.5,
+            43.552:0.5,
+            46.691: 0.5,
+
+        },
+        lyrics: [
+            {t: 16, text: "This a number one champion sound,"},
+            {t: 18, text: "Yeah, Estelle, we 'bout to get down"},
+            {t: 20, text: "Who the hottest in the world right now"},
+            {t: 22, text: "Just touched down in London town"},
+            {t: 24, text: "Bet they give me a pound"},
+            {t: 26, text: "Tell 'em put the money in my hand right now"},
+            {t: 28, text: "Tell the promoter we need more seats"},
+            {t: 30, text: "We just sold out all the floor seats"},
+            {t: 32, text: "Take me on a trip, I'd like to go someday"},
+            {t: 36, text: "Take me to New York, I'd love to see LA"},
+            {t: 40, text: "I really want to come kick it with you"},
+            {t: 44, text: "You'll be my American boy"}
+        ]
+    },
 
     // eerie
     hangingtree: {
