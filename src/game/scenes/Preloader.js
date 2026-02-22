@@ -76,6 +76,7 @@ export class Preloader extends Scene
 
         const goToCutePhase = () => this.scene.start('SelectLevel' + Phases.CUTE.toUpperCase());
         if (this.cache.video.exists('introCutscene')) {
+            const SKIP_THRESHOLD = 0.3;
             const video = this.add.video(this.scale.width / 2, this.scale.height / 2, 'introCutscene');
             video.play();
 
@@ -85,6 +86,8 @@ export class Preloader extends Scene
             video.on('complete', goToCutePhase);
             video.on('error', goToCutePhase);
             video.play();
+
+            setTimeout(() => { EventBus.on('volume-detect', (v) => { if (v > SKIP_THRESHOLD) goToCutePhase(); }) }, 1500)
         } else {
             goToCutePhase();
         }
