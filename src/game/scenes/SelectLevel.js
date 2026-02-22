@@ -31,7 +31,8 @@ export class SelectLevel extends Scene {
       this.levelLabelMap[level['song']] = levelLabel;
       levelLabels.add(levelLabel);
     });
-    this.selected = this.phaseLevelData[this.phaseLevelData.length - 1];
+    this.selected = this.phaseLevelData[0];
+    this.idx = this.phaseLevelData.length - 1;
     Phaser.Actions.GridAlign(
       levelLabels.getChildren(),
       {
@@ -43,7 +44,7 @@ export class SelectLevel extends Scene {
       }
     )   
     this.curVol = null;
-    setTimeout(() => {EventBus.on('volume-detect', (v) => this.manualVoiceSelect(v));}, 2000) // wait to prevent scream input overlap
+    setTimeout(() => {EventBus.on('volume-detect', (v) => this.manualVoiceSelect(v));}, 1000) // wait to prevent scream input overlap
   }
 
   manualVoiceSelect(volume) {
