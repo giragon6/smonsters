@@ -84,7 +84,6 @@ export const levels = {
             {t: 161.5, text: "Buns out, weiner but I gotta keep an eye out for Selener"}
         ]
     },
-// add beauty and a beat, payphone, califronia girls, american boy
 
     // eerie
     hangingtree: {
@@ -155,26 +154,28 @@ export const levels = {
             {t: 238, text: "My heart will go on and on"}
         ]
     },
-    //  add bad guy and bury a friend and toxic
-    hangingtree: {
-        song: "The Hanging Tree (Jennifer Lawrence)",
-        audio: "/hangingtree.mp3",
+    badguy:{
+        song: "bad guy (Billie Eilish)",
+        audio: "/badguy.mp3",
+        phase: "eerie",
         phase: Phases.EERIE,
-        level: "???",
-        start: 81.5,
-        end: 100,
-        beats: [85.886,86.152,87.081,87.431,88.522,88.721,89.063,89.322,89.636,90.457,90.764,91.383,91.686,92,92.827,93.22,93.754,94.049,94.367,95.66,96.194,96.487,96.848,97.154,97.483,97.79,98.117,98.407,98.695,98.984,99.303,100.192,100.524,101.224,101.662,102.465,102.854,103.152,103.438,103.68,103.97],
+        level: "medium",
+        maxMissed: 13,
+        start:45, 
+        end: 62,
+        beats: [49.774,49.93,50.267,50.722,51.145,51.337,51.525,51.732,52.002,52.422,52.901,53.088,53.336,53.544,53.764,54.256,54.697,54.865,55.051,55.269,55.586,55.997,57.026,57.166,57.488,58.66,60.397],
         holdBeats: {
-            86.152:0.5,
-            87.431:0.5, 
-            89.322: 0.25,
-            90.764: 0.25,
-            92: 0.25,
-            93.22: 0.25,
-            94.367: 0.5
+            57.488: 1
         },
-        lyrics:[]
+        lyrics: [
+            {t: 49, text:"I'm the bad type"},
+            {t: 50.5, text: "Make your mama sad type"},
+            {t:52, text:"Make your girlfriend mad type"},
+            {t: 53.5, text: "Might seduce your dad type"},
+            {t: 55, text: "I'm the bad guy, duh"}
+        ]
     },
+
     // // creepy
     piano: {
         song: "Davy Jones (Disney's Pirates of the Caribbean)",
