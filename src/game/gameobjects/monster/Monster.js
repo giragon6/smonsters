@@ -2,6 +2,7 @@ import { EventBus } from '../../EventBus.js';
 
 export default class Monster extends Phaser.GameObjects.Sprite {
   static tolerance = 0.1;
+  static damage = 10;
   
   animKey;
   scene;
@@ -47,7 +48,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     this.scale = this.scaleInitial;
     this.dscale = (this.scaleFinal - this.scaleInitial)/((Number(this.duration) + Number(this.appearOffset)) * 1000);
 
-    // this.scene.add.existing(this);
+    this.scene.add.existing(this);
   }
 
   update(time, delta) {
@@ -61,11 +62,6 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     } else if (this.getCurrentAudioTime() > (this.beat - this.appearOffset)) {
       this.setVisible(true);
     }
-  }
-
-  onGameEnd() {
-    this.setVisible(false);
-    this.destroy();
   }
 
   onHit() {

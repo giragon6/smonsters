@@ -12,8 +12,9 @@ export class SelectLevel extends Scene {
   timeout = Date.now();
   throttle = 2000;
   idx = 0;
+  hasFinishedSelection = false; //idek bro
 
-  VOL_THRESHOLD = 0.3;
+  VOL_THRESHOLD = 0.05;
 
   constructor(key)
   {
@@ -41,28 +42,14 @@ export class SelectLevel extends Scene {
         y: 300
       }
     )   
-  }
-
-  init() {
     this.curVol = null;
     EventBus.on('volume-detect', (v) => this.manualVoiceSelect(v));
   }
 
-  handleRecognition(words) {
-    for (const level of this.phaseLevelData) {
-      for (const word of words) {
-        if (word == level['song'].split(' ')[0]) {
-          this.scene.start(toLevelKey(level['song']));
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   manualVoiceSelect(volume) {
     this.curVol = volume;
-    if (this.curVol > this.VOL_THRESHOLD) {
+    if (this.curVol > this.VOL_THRESHOLD && !this.hasFinishedSelection) {
+      this.hasFinishedSelection = true;
       EventBus.off('volume-detect', null, this);
       this.scene.start(toLevelKey(this.selected['song']));
     }

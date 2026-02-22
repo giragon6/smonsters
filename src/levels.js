@@ -59,7 +59,7 @@ export const levels = {
     myheartwillgoon: {
         song: "My Heart Will Go On (Celine Dion)",
         audio: "/myheartwillgoon.mp3",
-        phase: "cute",
+        phase: Phases.EERIE,
         level: "easy",
         start: 200,
         end: 245,
@@ -97,7 +97,7 @@ export const levels = {
     hangingtree: {
         song: "The Hanging Tree (Jennifer Lawrence)",
         audio: "/hangingtree.mp3",
-        phase: "creepy",
+        phase: Phases.EERIE,
         level: "???",
         start: 81.5,
         end: 100,

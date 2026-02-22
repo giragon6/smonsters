@@ -11,7 +11,7 @@ export const Phases = Object.freeze({
 });
 
 export class Level extends Scene
-{
+{    
     health = 100;
     phase;
     campfire;
@@ -29,17 +29,19 @@ export class Level extends Scene
         super(key);
         this.phase = levelData['phase'].toLowerCase();
         this.levelData = levelData;
-        this.fireAssetKey = this.phase + '-campfire';
-        this.fireAnimKey = this.phase + '-campfire-crackle';
-        this.logsKey = this.phase + '-logs';
-        this.monsterAssetKey = this.phase + '-monster';
-        this.monsterAnimKey = this.phase + '-monster-idle';
+        this.fireAssetKey = this.phase.toLowerCase() + '-campfire';
+        this.fireAnimKey = this.phase.toLowerCase() + '-campfire-crackle';
+        this.logsKey = this.phase.toLowerCase() + '-logs';
+        this.monsterAssetKey = this.phase.toLowerCase() + '-monster';
+        this.monsterAnimKey = this.phase.toLowerCase() + '-monster-idle';
     }
 
     create ()
     {
         this.add.image(this.scale.width / 2, this.scale.height / 2, 'background-no-fire');
         
+        console.log(Math.round(this.levelData.beats.length * 0.75) * Monster.damage)
+
         this.campfire = new Campfire(
             this, 
             this.scale.width / 2, 
@@ -48,19 +50,14 @@ export class Level extends Scene
             this.fireAssetKey, 
             this.fireAnimKey, 
             this.logsKey,
-            100
+            Math.round(this.levelData.beats.length * 0.75) * Monster.damage //need to get 75% beats
         );
 
         this.add.existing(this.campfire)
 
         this.monsters = this.add.group({ runChildUpdate: true });
 
-        // this.events.on("ready", this.ready);
         EventBus.emit('current-scene-ready', this);
-    }
-    
-    init() {
-        if (!this.monsters) this.monsters = this.add.group({ runChildUpdate: true });
         EventBus.emit('start-rhythm-game', this.levelData, this);
     }
 
@@ -72,10 +69,10 @@ export class Level extends Scene
         appearOffset,
         startAudioTime, 
         getCurrentAudioTime,
-        damage = 10,
         scaleInitial = 0.25,
         scaleFinal = 0.5
     ) {
+
         const monster = new Monster(
             this, 
             x, 
@@ -87,18 +84,30 @@ export class Level extends Scene
             appearOffset,
             startAudioTime,
             getCurrentAudioTime,
-            damage,
+            Monster.damage,
             scaleInitial,
             scaleFinal
         )
-        this.monsters.add(monster, true);
+        this.monsters.add(monster);
         monster.depth = 100;
         return monster;
     }
 
     gameOver()
     {
-        this.monsters.clear(true, true);
+        this.monsters.clear(false, true);
         this.scene.start('GameOver');
+    }
+
+    win()
+    {
+        if (this.phase == Phases.CUTE) {
+            this.scene.start('SelectLevel'+Phases.EERIE.toUpperCase())
+        } else if (this.phase == Phases.EERIE) {
+            this.scene.start('SelectLevel'+Phases.CREEPY.toUpperCase())
+        } else {
+            //unimplemented
+            this.scene.start('GameOver');
+        }
     }
 }

@@ -35,8 +35,11 @@ export class Preloader extends Scene
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
         this.load.spritesheet('cute-monster', 'cute_monster.png', { frameWidth: 2048, frameHeight: 2048});
-        this.load.spritesheet('cute-campfire', 'cute_campfire.png',{ frameWidth: 2048 } )
+        this.load.spritesheet('cute-campfire', 'cute_campfire.png',{ frameWidth: 2048, frameHeight: 2048 } )
         this.load.image('cute-logs', 'cute_logs.png');
+        this.load.spritesheet('eerie-monster', 'eerie_monster.png', { frameWidth: 2048, frameHeight: 2048});
+        this.load.spritesheet('eerie-campfire', 'eerie_campfire.png',{ frameWidth: 2048, frameHeight: 2048 } )
+        this.load.image('eerie-logs', 'eerie_logs.png');
     }
 
     create ()
@@ -53,6 +56,20 @@ export class Preloader extends Scene
         this.anims.create({
             key: 'cute-campfire-crackle',
             frames: this.anims.generateFrameNumbers('cute-campfire'),
+            frameRate: 6,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'eerie-monster-idle',
+            frames: this.anims.generateFrameNumbers('eerie-monster'),
+            frameRate: 6,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'eerie-campfire-crackle',
+            frames: this.anims.generateFrameNumbers('eerie-campfire'),
             frameRate: 6,
             repeat: -1
         })
