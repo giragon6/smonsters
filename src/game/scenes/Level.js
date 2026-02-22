@@ -88,7 +88,7 @@ export class Level extends Scene
             scaleInitial,
             scaleFinal
         )
-        this.monsters.add(monster);
+        this.monsters.add(monster, true);
         monster.depth = 100;
         return monster;
     }

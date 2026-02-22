@@ -14,6 +14,7 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   damage;
   scaleInitial;
   scaleFinal;
+  isHit;
 
   constructor(
     scene, 
@@ -42,22 +43,27 @@ export default class Monster extends Phaser.GameObjects.Sprite {
     this.scaleInitial = Number(scaleInitial);
     this.scaleFinal = Number(scaleFinal);
 
+    this.isHit = false;
+
     this.play(this.animKey);
     this.setVisible(false);
 
     this.scale = this.scaleInitial;
     this.dscale = (this.scaleFinal - this.scaleInitial)/((Number(this.duration) + Number(this.appearOffset)) * 1000);
-
-    this.scene.add.existing(this);
   }
 
   update(time, delta) {
-    if (this.visible) {
+    if (this.visible && !this.isHit) {
       this.scale += this.dscale * delta; // todo: do with tweens
       if (this.getCurrentAudioTime() > (this.beat + this.duration + Monster.tolerance)) {
         //attack
         this.destroy()
         EventBus.emit('damage-taken', this.damage);
+      } else if (
+        this.getCurrentAudioTime() > (this.beat + this.duration - Monster.tolerance) &&
+        this.getCurrentAudioTime() < (this.beat + this.duration + Monster.tolerance)
+      ) {
+        this.setTint(0xff0000)
       }
     } else if (this.getCurrentAudioTime() > (this.beat - this.appearOffset)) {
       this.setVisible(true);
@@ -65,6 +71,10 @@ export default class Monster extends Phaser.GameObjects.Sprite {
   }
 
   onHit() {
-    this.destroy()
+    if (!this.isHit) {
+      this.isHit = true;
+      this.setTintFill(0xff0000);
+      this.scene.tweens.add({targets: this, alpha: 0, ease: 'Linear', duration: 250, onComplete: this.destroy()});
+    }
   }
 }
